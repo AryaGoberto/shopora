@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {useMemo, useState } from "react";
 import Header from "./Header";
 import Hero from "./Hero";
 import ProductCard from "./ProductCard";
