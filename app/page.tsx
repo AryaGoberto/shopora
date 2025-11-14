@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, User, Search, Menu, X, Star } from 'lucide-react';
+import Footer from './components/footer';
 
 interface Product {
   id: number;
@@ -133,22 +134,22 @@ const HomePage: React.FC = () => {
       {/* Top Banner */}
       <div className="text-white text-center py-2 text-sm" style={{backgroundColor: '#1230AE'}}>
         Sign up and get 20% off to your first order.{' '}
-        <a href="#" className="underline font-medium">Sign Up Now</a>
+        <a href="/signup" className="underline font-medium">Sign Up Now</a>
         <button className="absolute right-4 top-2 text-white">×</button>
       </div>
 
       {/* Header */}
       <header className="border-b sticky top-0 bg-white z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4 md:gap-8">
               <button 
                 className="lg:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
-              <h1 className="text-2xl font-bold">SHOP.CO</h1>
+              <h1 className="text-xl md:text-2xl font-bold">Shopora</h1>
               <nav className="hidden lg:flex gap-6">
                 <a href="#" className="hover:text-gray-600 flex items-center gap-1">
                   Shop
@@ -161,7 +162,7 @@ const HomePage: React.FC = () => {
                 <a href="#" className="hover:text-gray-600">Brands</a>
               </nav>
             </div>
-            <div className="flex items-center gap-4 flex-1 justify-end">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <div className="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 max-w-md w-full">
                 <Search className="text-gray-400" size={20} />
                 <input
@@ -171,9 +172,9 @@ const HomePage: React.FC = () => {
                 />
               </div>
               <button className="hover:text-gray-600">
-                <Search size={24} className="md:hidden" />
+                <Search size={20} className="md:hidden" />
               </button>
-              <button className="text-white px-6 py-2 rounded-full font-medium transition-colors" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'}>
+              <button className="text-white px-4 md:px-6 py-2 rounded-full font-medium transition-colors text-sm md:text-base" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'}>
                 Login
               </button>
             </div>
@@ -195,33 +196,33 @@ const HomePage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="bg-gray-100 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-8 items-center">
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-24 grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
+            <h2 className="text-3xl md:text-6xl font-black mb-4 md:mb-6 leading-tight">
               FIND CLOTHES<br />THAT MATCHES<br />YOUR STYLE
             </h2>
-            <p className="text-gray-600 mb-8 max-w-lg">
+            <p className="text-gray-600 text-sm md:text-base mb-6 md:mb-8 max-w-lg">
               Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.
             </p>
-            <button className="text-white px-12 py-4 rounded-full font-medium transition-colors" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'}>
+            <button className="text-white px-8 md:px-12 py-3 md:py-4 rounded-full font-medium transition-colors w-full md:w-auto" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'}>
               Shop Now
             </button>
-            <div className="flex gap-8 mt-12">
+            <div className="grid grid-cols-3 gap-4 md:gap-8 mt-8 md:mt-12">
               <div>
-                <div className="text-3xl font-bold">200+</div>
-                <div className="text-gray-600 text-sm">International Brands</div>
+                <div className="text-2xl md:text-3xl font-bold">200+</div>
+                <div className="text-gray-600 text-xs md:text-sm">International Brands</div>
               </div>
-              <div className="border-l pl-8">
-                <div className="text-3xl font-bold">2,000+</div>
-                <div className="text-gray-600 text-sm">High-Quality Products</div>
+              <div className="border-l pl-4 md:pl-8">
+                <div className="text-2xl md:text-3xl font-bold">2,000+</div>
+                <div className="text-gray-600 text-xs md:text-sm">High-Quality Products</div>
               </div>
-              <div className="border-l pl-8">
-                <div className="text-3xl font-bold">30,000+</div>
-                <div className="text-gray-600 text-sm">Happy Customers</div>
+              <div className="border-l pl-4 md:pl-8">
+                <div className="text-2xl md:text-3xl font-bold">30,000+</div>
+                <div className="text-gray-600 text-xs md:text-sm">Happy Customers</div>
               </div>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative hidden md:block">
             <div className="absolute top-20 right-20 text-6xl animate-bounce">✨</div>
             <div className="absolute bottom-20 left-10 text-6xl animate-bounce" style={{ animationDelay: '0.5s' }}>✨</div>
             <div className="bg-white rounded-lg p-8 flex items-center justify-center h-96">
@@ -321,7 +322,7 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "I'm blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations."
+              "I'm blown away by the quality and style of the clothes I received from Shopora. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations."
             </p>
           </div>
           <div className="border-2 border-gray-200 rounded-2xl p-6">
@@ -335,7 +336,7 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
+              "Finding clothes that align with my personal style used to be a challenge until I discovered Shopora. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
             </p>
           </div>
           <div className="border-2 border-gray-200 rounded-2xl p-6">
@@ -349,7 +350,7 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on-point with the latest trends."
+              "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shopora. The selection of clothes is not only diverse but also on-point with the latest trends."
             </p>
           </div>
         </div>
@@ -378,78 +379,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 mt-0">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
-            <div className="md:col-span-1">
-              <h3 className="font-bold text-2xl mb-4">SHOP.CO</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                We have clothes that suits your style and which you're proud to wear. From women to men.
-              </p>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <span className="text-xl">𝕏</span>
-                </a>
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <span className="text-xl">f</span>
-                </a>
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <span className="text-xl">in</span>
-                </a>
-                <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <span className="text-xl">⚫</span>
-                </a>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm tracking-wider">COMPANY</h4>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-black">About</a></li>
-                <li><a href="#" className="hover:text-black">Features</a></li>
-                <li><a href="#" className="hover:text-black">Works</a></li>
-                <li><a href="#" className="hover:text-black">Career</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm tracking-wider">HELP</h4>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-black">Customer Support</a></li>
-                <li><a href="#" className="hover:text-black">Delivery Details</a></li>
-                <li><a href="#" className="hover:text-black">Terms & Conditions</a></li>
-                <li><a href="#" className="hover:text-black">Privacy Policy</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm tracking-wider">FAQ</h4>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-black">Account</a></li>
-                <li><a href="#" className="hover:text-black">Manage Deliveries</a></li>
-                <li><a href="#" className="hover:text-black">Orders</a></li>
-                <li><a href="#" className="hover:text-black">Payments</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-sm tracking-wider">RESOURCES</h4>
-              <ul className="space-y-3 text-gray-600 text-sm">
-                <li><a href="#" className="hover:text-black">Free eBooks</a></li>
-                <li><a href="#" className="hover:text-black">Development Tutorial</a></li>
-                <li><a href="#" className="hover:text-black">How to - Blog</a></li>
-                <li><a href="#" className="hover:text-black">Youtube Playlist</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-600 text-sm">Shop.co © 2000-2023, All Rights Reserved</p>
-            <div className="flex gap-3">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-8 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-8 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png" alt="PayPal" className="h-8 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" alt="Apple Pay" className="h-8 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png" alt="Google Pay" className="h-8 object-contain" />
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
