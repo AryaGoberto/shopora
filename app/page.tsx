@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, User, Search, Menu, X, Star } from 'lucide-react';
 import Footer from './components/footer';
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -14,8 +15,11 @@ interface Product {
   rating?: number;
 }
 
+
+
 const HomePage: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   const newArrivals: Product[] = [
     {
@@ -174,7 +178,7 @@ const HomePage: React.FC = () => {
               <button className="hover:text-gray-600">
                 <Search size={20} className="md:hidden" />
               </button>
-              <button className="text-white px-4 md:px-6 py-2 rounded-full font-medium transition-colors text-sm md:text-base" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'}>
+              <button  onClick={() => router.push("/login")}className="text-white px-4 md:px-6 py-2 rounded-full font-medium transition-colors text-sm md:text-base" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'} >
                 Login
               </button>
             </div>
