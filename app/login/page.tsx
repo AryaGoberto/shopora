@@ -21,7 +21,11 @@ const LoginPage: React.FC = () => {
 
     try {
       // ✅ Login ke Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       console.log("✅ Login berhasil:", userCredential.user);
 
       // 🚀 Arahkan ke halaman utama (app/page.tsx)
@@ -47,14 +51,19 @@ const LoginPage: React.FC = () => {
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome Back!
+          </h1>
           <p className="text-gray-500">Sign in to continue to Shopora</p>
         </div>
 
         {/* Form Login */}
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email Address
             </label>
             <div className="relative rounded-full shadow-sm">
@@ -74,7 +83,10 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
             <div className="relative rounded-full shadow-sm">
@@ -112,7 +124,10 @@ const LoginPage: React.FC = () => {
         {/* Tautan Pendaftaran */}
         <div className="mt-8 text-center text-sm text-gray-600">
           Not a member?{" "}
-          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link
+            href="/signup"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Create an account
           </Link>
         </div>
