@@ -63,7 +63,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-600 text-sm">Shop.co © 2000-2023, All Rights Reserved</p>
+          <p className="text-gray-600 text-sm">Shopora © 2000-2023, All Rights Reserved</p>
           <div className="flex gap-3">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-8 object-contain" />
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-8 object-contain" />
