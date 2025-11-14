@@ -52,7 +52,7 @@ export default function Header({ cartCount = 0 }: { cartCount?: number }) {
           </button>
 
           <Link
-            href="/login"
+            href="../login"
             className="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm font-medium hover:bg-neutral-50"
           >
             Login
