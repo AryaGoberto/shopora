@@ -127,9 +127,7 @@ const HomePage: React.FC = () => {
         <span className="font-bold text-xl">${product.price}</span>
         {product.originalPrice && (
           <>
-            <span className="text-gray-400 line-through">
-              ${product.originalPrice}
-            </span>
+            <span className="text-gray-400 line-through">${product.originalPrice}</span>
             <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">
               {product.discount}
             </span>
@@ -158,7 +156,7 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <button
+              <button 
                 className="lg:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -172,7 +170,7 @@ const HomePage: React.FC = () => {
                   height={30}
                   className="h-8"
                 />{" "}
-                <h1 className="text-2xl font-bold">Shopora</h1>
+              <h1 className="text-2xl font-bold">Shopora</h1>
               </div>
               <nav className="hidden lg:flex gap-6">
                 <a
@@ -354,7 +352,7 @@ const HomePage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-4xl font-bold text-center mb-12">TOP SELLING</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {topSelling.map((product) => (
+          {topSelling.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
