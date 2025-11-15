@@ -1,4 +1,3 @@
-import localFont from "next/font/local";
 import "./globals.css"; // <-- WAJIB biar Tailwind masuk
 
 import { inter as Inter } from "./lib/font";

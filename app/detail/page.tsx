@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { integralCF_Fonts } from "../lib/font";
+import { integralCF_Fonts, playfair } from "../lib/font";
 import {
   ShoppingCart,
   Heart,
@@ -146,9 +146,7 @@ interface Product {
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
   <div className="bg-gray-50 rounded-2xl p-4 hover:shadow-lg transition-shadow cursor-pointer mt-10">
-    <div
-      className={`bg-white rounded-xl h-48 flex items-center justify-center text-6xl mb-4 ${integralCF_Fonts.className}`}
-    >
+    <div className="bg-white rounded-xl h-48 flex items-center justify-center text-6xl mb-4">
       {product.image}
     </div>
     <h3 className="font-bold text-base mb-1">{product.name}</h3>
@@ -192,9 +190,20 @@ const ProductDetailPage: React.FC = () => {
     <div className="min-h-screen bg-white">
       <header className="border-b sticky top-0 bg-white z-50 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-[#1230AE]">
-            Shopora
-          </Link>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo_shopora.svg"
+              alt="Shopora Logo"
+              width={30}
+              height={30}
+            />
+            <Link
+              href="/"
+              className={`text-2xl font-bold text-[#1230AE] ${playfair.className}`}
+            >
+              Shopora
+            </Link>
+          </div>
           <div className="flex items-center space-x-4">
             <Search size={24} className="text-gray-600" />
             <ShoppingCart size={24} className="text-gray-600" />
@@ -460,9 +469,7 @@ const ProductDetailPage: React.FC = () => {
 
         {/* 3. YOU MIGHT ALSO LIKE SECTION */}
         <div className="mt-10">
-          <h2
-            className={`text-4xl font-bold text-center text-[#1230AE] mb-6 md:mb-0 ${integralCF_Fonts.className}`}
-          >
+          <h2 className="text-4xl font-bold text-center text-[#1230AE] mb-6 md:mb-0">
             YOU MIGHT ALSO LIKE
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -474,10 +481,8 @@ const ProductDetailPage: React.FC = () => {
       </div>
 
       <section className="mt-10">
-        <div className="max-w-7xl mx-auto px-10 flex items-center flex-col md:flex-row justify-between items-center py-7  bg-[#1230AE] rounded-2xl">
-          <h2
-            className={`text-4xl font-bold text-white mb-6 md:mb-0 ${integralCF_Fonts.className} w-1/2`}
-          >
+        <div className="max-w-7xl mx-auto px-10 flex flex-col md:flex-row justify-between items-center py-7 bg-[#1230AE] rounded-2xl">
+          <h2 className="text-4xl font-bold text-white mb-6 md:mb-0 w-1/2">
             STAY UP TO DATE ABOUT OUR LATEST OFFERS
           </h2>
           <div className="flex flex-col w-full md:w-auto gap-3 rounded-2xl">
