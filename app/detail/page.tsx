@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { integralCF_Fonts, playfair } from "../lib/font";
+import { playfair } from "../lib/font";
 import {
   ShoppingCart,
   Heart,

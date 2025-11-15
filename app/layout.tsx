@@ -8,7 +8,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`bg-neutral-50 text-neutral-900 ${Inter.className}`}>{children}</body>
+      <body className={`bg-neutral-50 text-neutral-900 ${Inter.className}`}>
+        {children}
+      </body>
     </html>
   );
 }
