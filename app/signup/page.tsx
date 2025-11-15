@@ -38,7 +38,7 @@ const SignupPage: React.FC = () => {
 
       console.log("✅ User registered & saved to Firestore");
       router.push("/login");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Error registering user:", err);
       if (err.code === "auth/email-already-in-use") {
         setError("Email sudah terdaftar.");
