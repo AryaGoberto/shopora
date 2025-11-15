@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import { ShoppingCart, User, Search, Menu, X, Star } from 'lucide-react';
-import Footer from './components/footer';
+import React, { useState } from "react";
+import { ShoppingCart, User, Search, Menu, X, Star } from "lucide-react";
+import Footer from "./components/footer";
 import { useRouter } from "next/navigation";
-import Link from 'next/link';
-
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -16,8 +15,6 @@ interface Product {
   image: string;
   rating?: number;
 }
-
-
 
 const HomePage: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -214,11 +211,21 @@ const HomePage: React.FC = () => {
               <button className="hover:text-gray-600">
                 <Search size={20} className="md:hidden" />
               </button>
-              <button  onClick={() => router.push("/login")}className="text-white px-4 md:px-6 py-2 rounded-full font-medium transition-colors text-sm md:text-base" style={{backgroundColor: '#1230AE'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0f2890'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1230AE'} >
+              <button
+                onClick={() => router.push("/login")}
+                className="text-white px-4 md:px-6 py-2 rounded-full font-medium transition-colors text-sm md:text-base"
+                style={{ backgroundColor: "#1230AE" }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#0f2890")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#1230AE")
+                }
+              >
                 Login
               </button>
               <Link
-                href="/login"
+                href="/signup"
                 className="rounded-xl bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
               >
                 Sign Up
@@ -409,9 +416,9 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "I'm blown away by the quality and style of the clothes I received
+              &quot;I&apos;m blown away by the quality and style of the clothes I received
               from Shopora. From casual wear to elegant dresses, every piece
-              I've bought has exceeded my expectations."
+              I&apos;ve bought has exceeded my expectations.&quot;
             </p>
           </div>
           <div className="border-2 border-gray-200 rounded-2xl p-6">
@@ -428,10 +435,10 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "Finding clothes that align with my personal style used to be a
+              Finding clothes that align with my personal style used to be a
               challenge until I discovered Shopora. The range of options they
               offer is truly remarkable, catering to a variety of tastes and
-              occasions."
+              occasions.
             </p>
           </div>
           <div className="border-2 border-gray-200 rounded-2xl p-6">
@@ -448,10 +455,10 @@ const HomePage: React.FC = () => {
               <span className="text-green-500">✓</span>
             </div>
             <p className="text-gray-600 text-sm">
-              "As someone who's always on the lookout for unique fashion pieces,
-              I'm thrilled to have stumbled upon Shopora. The selection of
+              As someone who&apos;s always on the lookout for unique fashion pieces,
+              I&apos;m thrilled to have stumbled upon Shopora. The selection of
               clothes is not only diverse but also on-point with the latest
-              trends."
+              trends.
             </p>
           </div>
         </div>

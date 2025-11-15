@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { integralCF_Fonts } from "../lib/font";
 import {
   ShoppingCart,
   Heart,
@@ -10,7 +13,7 @@ import {
   Plus,
   Minus,
   Search,
-} from "lucide-react"; // 'Search' ditambahkan
+} from "lucide-react";
 
 // --- MOCK DATA ---
 const currentProduct = {
@@ -20,8 +23,8 @@ const currentProduct = {
   originalPrice: 250000,
   discount: "30%",
   description:
-    "Didesain dengan bahan katun premium dan jahitan yang presisi. Kaos grafis One Life kami hadir dalam berbagai warna unik. Sempurna untuk tampilan kasual dan trendi.",
-  rating: 4.8,
+    "Didesain dengan bahan katun premium dan jahitan yang presisi. Kaos grafis One Life kami hadir dalam eberbagai warna unik. Sempurna untuk tampilan kasual dan trendi.",
+  rating: 4.3,
   reviewsCount: 112,
   colors: [
     { name: "Green", hex: "#4CAF50" },
@@ -30,9 +33,9 @@ const currentProduct = {
   ],
   sizes: ["S", "M", "L", "XL", "XXL"],
   images: [
-    "https://placehold.co/400x500/4CAF50/FFFFFF?text=T+Shirt+Front", // Main image placeholder
-    "https://placehold.co/400x500/7CB342/FFFFFF?text=T+Shirt+Model", // Secondary image
-    "https://placehold.co/400x500/A27B5E/FFFFFF?text=Detail", // Detail image
+    "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png", // Main image placeholder
+    "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png", // Secondary image
+    "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_t.png", // Detail image
   ],
 };
 
@@ -137,13 +140,15 @@ interface Product {
   name: string;
   price: number;
   originalPrice?: number;
-  discount?: string;
+  discount?: string | null;
   image: string;
 }
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
-  <div className="bg-gray-50 rounded-2xl p-4 hover:shadow-lg transition-shadow cursor-pointer">
-    <div className="bg-white rounded-xl h-48 flex items-center justify-center text-6xl mb-4">
+  <div className="bg-gray-50 rounded-2xl p-4 hover:shadow-lg transition-shadow cursor-pointer mt-10">
+    <div
+      className={`bg-white rounded-xl h-48 flex items-center justify-center text-6xl mb-4 ${integralCF_Fonts.className}`}
+    >
       {product.image}
     </div>
     <h3 className="font-bold text-base mb-1">{product.name}</h3>
@@ -185,12 +190,11 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header/Banner placeholder (assuming it's fixed/global) */}
       <header className="border-b sticky top-0 bg-white z-50 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <a href="/" className="text-2xl font-bold text-[#1230AE]">
+          <Link href="/" className="text-2xl font-bold text-[#1230AE]">
             Shopora
-          </a>
+          </Link>
           <div className="flex items-center space-x-4">
             <Search size={24} className="text-gray-600" />
             <ShoppingCart size={24} className="text-gray-600" />
@@ -207,21 +211,50 @@ const ProductDetailPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-6">
-          <a href="/" className="hover:underline">
-            Home
-          </a>{" "}
-          &gt;
-          <a href="#" className="hover:underline">
-            Shop
-          </a>{" "}
-          &gt;
-          <a href="#" className="hover:underline">
-            Men
-          </a>{" "}
-          &gt;
-          <span className="text-gray-800">T-shirts</span>
-        </div>
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+            {/* Item 1: Home */}
+            <li className="flex items-center">
+              <Link
+                href="/"
+                className="hover:text-gray-700 transition duration-150"
+              >
+                Home
+              </Link>
+            </li>
+
+            {/* Pemisah (Menggunakan elemen pseudo/CSS untuk versi lebih canggih, 
+            tapi kita pakai span saja agar sederhana dan konsisten) */}
+            <span className="text-gray-400">/</span>
+
+            {/* Item 2: Shop */}
+            <li className="flex items-center">
+              <a
+                href="#"
+                className="hover:text-gray-700 transition duration-150"
+              >
+                Shop
+              </a>
+            </li>
+            <span className="text-gray-400">/</span>
+
+            {/* Item 3: Men */}
+            <li className="flex items-center">
+              <a
+                href="#"
+                className="hover:text-gray-700 transition duration-150"
+              >
+                Men
+              </a>
+            </li>
+            <span className="text-gray-400">/</span>
+
+            {/* Item Terakhir: T-shirts (Tidak perlu link) */}
+            <li className="text-gray-800 font-medium" aria-current="page">
+              T-shirts
+            </li>
+          </ol>
+        </nav>
 
         {/* 1. PRODUCT DETAIL SECTION (SPLIT LAYOUT) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -230,16 +263,12 @@ const ProductDetailPage: React.FC = () => {
             {/* Main Image */}
             <div className="flex-1 bg-gray-100 rounded-xl overflow-hidden shadow-lg h-[600px] flex items-center justify-center text-9xl">
               {/* Using mainImage state */}
-              <img
+              <Image
                 src={mainImage}
                 alt={currentProduct.title}
+                width={500}
+                height={600}
                 className="w-full h-full object-cover"
-                onError={(e: any) =>
-                  (e.target.onerror =
-                    null &&
-                    (e.target.src =
-                      "https://placehold.co/400x500/E5E7EB/1F2937?text=NO+IMAGE"))
-                }
               />
             </div>
 
@@ -255,16 +284,12 @@ const ProductDetailPage: React.FC = () => {
                   }`}
                   onClick={() => setMainImage(img)}
                 >
-                  <img
+                  <Image
                     src={img}
                     alt={`Thumbnail ${index + 1}`}
+                    width={100}
+                    height={100}
                     className="w-full h-full object-cover"
-                    onError={(e: any) =>
-                      (e.target.onerror =
-                        null &&
-                        (e.target.src =
-                          "https://placehold.co/80x100/E5E7EB/1F2937?text=Img"))
-                    }
                   />
                 </div>
               ))}
@@ -297,13 +322,10 @@ const ProductDetailPage: React.FC = () => {
               </div>
               <span>({currentProduct.reviewsCount} reviews)</span>
             </div>
-
-            {/* Description */}
             <p className="text-gray-600 mb-8 max-w-lg">
               {currentProduct.description}
             </p>
 
-            {/* Colors Selection */}
             <div className="mb-8">
               <p className="text-lg font-semibold mb-3">Pilih Warna:</p>
               <div className="flex space-x-3">
@@ -325,8 +347,6 @@ const ProductDetailPage: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Sizes Selection */}
             <div className="mb-8">
               <p className="text-lg font-semibold mb-3">Pilih Ukuran:</p>
               <div className="flex space-x-3">
@@ -345,10 +365,7 @@ const ProductDetailPage: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Quantity and Actions */}
             <div className="flex items-center space-x-4">
-              {/* Quantity Input */}
               <div className="flex items-center border border-gray-300 rounded-full overflow-hidden">
                 <button
                   onClick={() => handleQuantityChange("decrease")}
@@ -364,8 +381,6 @@ const ProductDetailPage: React.FC = () => {
                   <Plus size={20} />
                 </button>
               </div>
-
-              {/* Add to Cart Button */}
               <button
                 className="flex-1 flex items-center justify-center space-x-3 py-3 px-6 rounded-full text-white font-semibold text-lg transition-colors shadow-lg"
                 style={{ backgroundColor: "#1230AE" }}
@@ -388,9 +403,7 @@ const ProductDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. TABS & REVIEWS SECTION */}
-        <div className="mt-20">
-          {/* Tabs Navigation */}
+        <div className="mt-10">
           <div className="flex border-b border-gray-200 text-lg font-medium space-x-8 mb-8">
             <button className="py-2 px-1 border-b-2 border-[#1230AE] text-[#1230AE] transition-colors">
               Product Details
@@ -431,7 +444,7 @@ const ProductDetailPage: React.FC = () => {
                     {renderStars(review.rating, "w-3 h-3")}
                   </div>
                 </div>
-                <p className="text-gray-800 mb-2">"{review.text}"</p>
+                <p className="text-gray-800 mb-2">&quot;{review.text}&quot;</p>
                 <span className="text-xs text-gray-500">
                   Posted on {review.date}
                 </span>
@@ -446,8 +459,10 @@ const ProductDetailPage: React.FC = () => {
         </div>
 
         {/* 3. YOU MIGHT ALSO LIKE SECTION */}
-        <div className="mt-20">
-          <h2 className="text-4xl font-bold text-center mb-12">
+        <div className="mt-10">
+          <h2
+            className={`text-4xl font-bold text-center text-[#1230AE] mb-6 md:mb-0 ${integralCF_Fonts.className}`}
+          >
             YOU MIGHT ALSO LIKE
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -458,33 +473,34 @@ const ProductDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Subscription/Footer Section (Reusing structure from HomePage) */}
-      <section className="bg-[#1230AE] py-16 mt-20">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-          <h2 className="text-3xl font-bold text-white mb-6 md:mb-0">
+      <section className="mt-10">
+        <div className="max-w-7xl mx-auto px-10 flex items-center flex-col md:flex-row justify-between items-center py-7  bg-[#1230AE] rounded-2xl">
+          <h2
+            className={`text-4xl font-bold text-white mb-6 md:mb-0 ${integralCF_Fonts.className} w-1/2`}
+          >
             STAY UP TO DATE ABOUT OUR LATEST OFFERS
           </h2>
-          <div className="flex w-full md:w-auto">
+          <div className="flex flex-col w-full md:w-auto gap-3 rounded-2xl">
             <input
               type="email"
               placeholder="Enter your email address"
-              className="py-3 px-4 rounded-l-full w-full md:w-80 outline-none"
+              className="py-3 px-4 rounded-4xl w-full md:w-80 outline-none bg-white"
             />
-            <button className="py-3 px-6 bg-white text-[#1230AE] font-semibold rounded-r-full hover:bg-gray-100 transition-colors">
-              Subscribe
+            <button className="py-3 px-6 bg-white text-[#1230AE] font-semibold rounded-4xl hover:bg-gray-100 transition-colors">
+              Subscribe to Newsletter
             </button>
           </div>
         </div>
       </section>
 
-      <footer className="bg-gray-100">
+      <footer className="bg-gray-100 mt-10">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="font-bold text-xl mb-4">Shopora</h3>
               <p className="text-gray-600 text-sm mb-4">
-                We have clothes that suits your style and which you're proud to
-                wear. From women to men.
+                We have clothes that suits your style and which you&apos;re
+                proud to wear. From women to men.
               </p>
             </div>
             <div>

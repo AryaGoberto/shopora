@@ -30,7 +30,7 @@ const LoginPage: React.FC = () => {
 
       // 🚀 Arahkan ke halaman utama (app/page.tsx)
       router.push("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Gagal login:", err);
       if (err.code === "auth/user-not-found") {
         setError("Akun tidak ditemukan. Silakan daftar terlebih dahulu.");
