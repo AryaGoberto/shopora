@@ -1,104 +1,108 @@
 // app/search/page.tsx
-"use client"; 
+import React from "react";
+import ProductCard from "../components/ProductCard"; 
+import { FakeProduct, Product } from "../lib/types"; 
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Search, X } from 'lucide-react';
+async function getAllProducts() {
+  const res = await fetch('https://fakestoreapi.com/products', { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+}
 
-// Data tiruan (mock) dari screenshot Anda
-const dummyPopularSearches = [
-  "Raket padel",
-  "Monitor gaming",
-  "Kemeja putih wanita",
-  "Sepatu kanvas pria",
-  "Casing Iphone 15 pro max",
-  "Jam tangan olahraga",
-  "Sandal Jepit",
-];
+// PERBAIKAN 1: Definisikan tipe searchParams sebagai Promise
+interface SearchPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-export default function SearchPage() {
-  const router = useRouter();
-  const [searchHistory, setSearchHistory] = useState(dummyPopularSearches);
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  // PERBAIKAN 2: Kita harus 'await' searchParams dulu agar datanya terbaca
+  const resolvedSearchParams = await searchParams;
+  const query = typeof resolvedSearchParams.q === 'string' ? resolvedSearchParams.q : '';
 
-  // Fungsi untuk menghapus satu item dari riwayat
-  const handleRemoveItem = (itemToRemove: string) => {
-    setSearchHistory(prevHistory => 
-      prevHistory.filter(item => item !== itemToRemove)
-    );
-  };
+  // Ambil semua data mentah
+  const rawProducts: FakeProduct[] = await getAllProducts();
 
-  // Fungsi untuk menghapus semua riwayat
-  const handleClearAll = () => {
-    setSearchHistory([]);
-  };
+  // PERBAIKAN 3: Pastikan jika query kosong, hasilnya KOSONG (bukan semua produk)
+  let filteredRawProducts: FakeProduct[] = [];
+
+  if (query.trim() !== "") {
+    // Lakukan filtering hanya jika ada text pencarian
+    filteredRawProducts = rawProducts.filter((item) => {
+      const lowerQuery = query.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(lowerQuery) || 
+        item.category.toLowerCase().includes(lowerQuery)
+      );
+    });
+  }
+
+  // Mapping Data (Sama seperti sebelumnya)
+  const products: Product[] = filteredRawProducts.map((item) => {
+    const shouldHaveDiscount = item.id % 2 !== 0; 
+    let displayedOriginalPrice = undefined;
+    let displayedDiscount = undefined;
+
+    if (shouldHaveDiscount) {
+        const markup = item.price * 1.3;
+        displayedOriginalPrice = Number(markup.toFixed(2));
+        displayedDiscount = "30% OFF";
+    }
+
+    return {
+      id: item.id,
+      name: item.title,
+      price: item.price,
+      image: item.image,
+      rating: item.rating.rate,
+      originalPrice: displayedOriginalPrice,
+      discount: displayedDiscount
+    };
+  });
 
   return (
-    // --- DIV YANG SUDAH DIPERBAIKI (TANPA KOMENTAR) ---
-    <div className="h-screen bg-white text-gray-900 flex flex-col
-                    md:h-auto
-                    md:max-w-2xl
-                    md:mx-auto
-                    md:mt-12
-                    md:rounded-xl
-                    md:border
-                    md:border-gray-200
-                    md:shadow-lg"
-    >
-      
-      {/* 1. Header: Tombol Kembali & Search Bar */}
-      <header className="flex items-center gap-2 p-4 border-b border-gray-200">
-        <button
-          onClick={() => router.back()} // Menggunakan router untuk kembali
-          className="p-2 text-gray-600 hover:text-gray-900 rounded-full"
-          aria-label="Kembali"
-        >
-          <ArrowLeft size={24} />
-        </button>
-        
-        {/* Search Input */}
-        <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2.5">
-          <Search size={20} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Find your favorite items"
-            className="w-full bg-transparent outline-none text-sm placeholder-gray-500"
-          />
-        </div>
-      </header>
-
-      {/* 2. Konten: Popular Searches */}
-      <main className="p-4 md:pb-6">
-        {/* Judul dan Tombol Clear All */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-base text-gray-800">
-            Popular Searches
-          </h2>
-          <button
-            onClick={handleClearAll}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-          >
-            Clear All
-          </button>
+    <div className="min-h-screen bg-gray-50">
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <Link href="/" className="inline-flex items-center text-gray-600 hover:text-black mb-4 transition-colors">
+            <ArrowLeft size={20} className="mr-2" /> Back to Home
+          </Link>
+          
+          <h1 className="text-3xl font-bold">
+            Search Results for <span className="text-blue-700">"{query}"</span>
+          </h1>
+          
+          {/* Tampilkan jumlah hanya jika ada query */}
+          {query && (
+             <p className="text-gray-500 mt-2">
+               Found {products.length} products matching your search.
+             </p>
+          )}
         </div>
 
-        {/* Daftar Riwayat Pencarian */}
-        <div className="space-y-2">
-          {searchHistory.map((item) => (
-            <div 
-              key={item} 
-              className="flex justify-between items-center py-2"
-            >
-              <span className="text-sm text-gray-700">{item}</span>
-              <button
-                onClick={() => handleRemoveItem(item)}
-                className="p-1 text-gray-500 hover:text-gray-800 rounded-full"
-                aria-label={`Hapus ${item}`}
-              >
-                <X size={18} />
-              </button>
-            </div>
-          ))}
-        </div>
+        {/* Tampilan Jika Query Kosong atau Tidak Ada Hasil */}
+        {products.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
+            <div className="text-6xl mb-4">🔍</div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">
+              {query.trim() === "" ? "Waiting for search..." : "No products found"}
+            </h2>
+            <p className="text-gray-500 max-w-md mx-auto">
+              {query.trim() === "" 
+                ? "Please type something in the search bar to find products."
+                : `We couldn't find any products matching "${query}". Try using general keywords like "jacket", "men", or "gold".`
+              }
+            </p>
+          </div>
+        ) : (
+          /* Grid Produk */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
