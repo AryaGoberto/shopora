@@ -14,6 +14,7 @@ import {
   Minus,
   Search,
 } from "lucide-react";
+import Newsletter from "../components/NewsLetter";
 
 // --- MOCK DATA ---
 const currentProduct = {
@@ -480,23 +481,7 @@ const ProductDetailPage: React.FC = () => {
         </div>
       </div>
 
-      <section className="mt-10">
-        <div className="max-w-7xl mx-auto px-10 flex flex-col md:flex-row justify-between items-center py-7 bg-[#1230AE] rounded-2xl">
-          <h2 className="text-4xl font-bold text-white mb-6 md:mb-0 w-1/2">
-            STAY UP TO DATE ABOUT OUR LATEST OFFERS
-          </h2>
-          <div className="flex flex-col w-full md:w-auto gap-3 rounded-2xl">
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="py-3 px-4 rounded-4xl w-full md:w-80 outline-none bg-white"
-            />
-            <button className="py-3 px-6 bg-white text-[#1230AE] font-semibold rounded-4xl hover:bg-gray-100 transition-colors">
-              Subscribe to Newsletter
-            </button>
-          </div>
-        </div>
-      </section>
+      <Newsletter />
 
       <footer className="bg-gray-100 mt-10">
         <div className="max-w-7xl mx-auto px-4 py-12">

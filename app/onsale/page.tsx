@@ -3,6 +3,8 @@ import { Search, ShoppingCart, User, Star, Twitter, Facebook, Instagram, Github,
 import Image from 'next/image';
 import Footer from '../components/footer';
 import Header from '../components/Header';
+import Newsletter from '../components/NewsLetter';
+import TopBanner from '../components/TopBanner';
 
 // --- TIPE DATA & MOCK DATA ---
 interface Product {
@@ -47,16 +49,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white font-sans">
       
-      {/* 1. TOP BANNER */}
-      <div className="bg-blue-900 text-white text-xs sm:text-sm py-2 text-center relative">
-        <p>
-          Sign up and get 20% off to your first order. <span className="font-bold underline cursor-pointer">Sign Up Now</span>
-        </p>
-        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white hidden sm:block">✕</button>
-      </div>
+      <TopBanner/>
 
-      {/* 2. NAVBAR */}
-      <Header></Header>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-6">
         
@@ -121,30 +116,8 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* 5. NEWSLETTER SECTION */}
-      <section className="relative mt-20">
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="bg-blue-800 rounded-3xl px-6 py-10 md:px-16 md:py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-            <h2 className="text-3xl md:text-4xl font-black text-white max-w-lg uppercase leading-tight">
-              Stay upto date about our latest offers
-            </h2>
-            <div className="w-full md:w-auto flex flex-col gap-3 w-full max-w-sm">
-              <div className="bg-white rounded-full px-4 py-3 flex items-center">
-                <Mail className="text-gray-400 w-5 h-5 mr-2" />
-                <input type="email" placeholder="Enter your email address" className="outline-none w-full text-sm" />
-              </div>
-              <button className="bg-white text-black font-medium rounded-full px-4 py-3 w-full hover:bg-gray-100 transition">
-                Subscribe to Newsletter
-              </button>
-            </div>
-          </div>
-        </div>
-        {/* Background abu-abu separuh bawah untuk blending ke footer */}
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-[#F0F0F0] -z-0"></div>
-      </section>
-
-      {/* 6. FOOTER */}
-      <Footer></Footer>
+      <Newsletter/>
+      <Footer />
     </div>
   );
 }
