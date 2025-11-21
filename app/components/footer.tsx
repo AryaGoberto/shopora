@@ -1,5 +1,7 @@
 import React from "react";
-import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Instagram, Link } from "lucide-react";
+import { playfair, integralCF_Fonts, inter } from "../lib/font";
+import Image from "next/image";
 
 const Footer: React.FC = () => {
   return (
@@ -7,8 +9,21 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div className="md:col-span-1">
-            <h3 className="font-bold text-2xl mb-4">Shopora</h3>
-            <p className="text-gray-600 text-sm mb-4">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo_shopora.svg"
+                alt="Shopora Logo"
+                width={30}
+                height={30}
+              />
+              <Link
+                href="/"
+                className={`text-2xl font-bold text-[#1230AE] ${playfair.className}`}
+              >
+                Shopodra
+              </Link>
+            </div>
+            <p className={`text-gray-600 text-sm mb-4 ${inter.className}`}>
               We have clothes that suits your style and which you&apos;re proud
               to wear. From women to men.
             </p>
@@ -115,21 +130,21 @@ const Footer: React.FC = () => {
             </ul>
           </div>
           <div>
-            <h4 className="font-bold mb-4 text-sm tracking-wider">RESOURCES</h4>
+            <h4 className="font-bold mb-4 text-sm tracking-wider">Contacts</h4>
             <ul className="space-y-3 text-gray-600 text-sm">
               <li>
                 <a href="#" className="hover:text-black">
-                  Free eBooks
+                  Jl BTP Blok M No.23 A
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-black">
-                  Development Tutorial
+                  Call (081388296720)
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-black">
-                  How to - Blog
+                  info@shopora.com
                 </a>
               </li>
               <li>

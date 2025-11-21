@@ -5,6 +5,8 @@ import Header from "./components/Header";
 import Footer from "./components/footer"; 
 import { FakeProduct, Product } from "./lib/types";
  
+import Newsletter from "./components/NewsLetter";
+import TopBanner from "./components/TopBanner";
 
 async function getProducts() {
   const res = await fetch('https://fakestoreapi.com/products', { cache: 'no-store' });
@@ -50,6 +52,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-white">
+      <TopBanner/>
       <Header />
       <HeroSection />
       
@@ -63,7 +66,7 @@ export default async function Home() {
           ))}
         </div>
       </section>
-
+      <Newsletter/>
       <Footer />
     </main>
   );

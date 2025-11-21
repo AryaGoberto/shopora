@@ -1,21 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        // Ganti hostname ini dengan domain yang kamu butuhkan
+        hostname: "fakestoreapi.com",
+        // Hapus properti 'domains' karena tidak digunakan
       },
+      // Kamu bisa menambahkan pola lain di sini, misalnya:
       {
         protocol: "https",
         hostname: "placehold.co",
-      },
-      {
-        protocol: "https",
-        hostname: "fakestoreapi.com",
       },
     ],
   },
