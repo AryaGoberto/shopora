@@ -1,57 +1,64 @@
 // app/api/chat/route.ts
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request: Request) {
-  console.log("1. Memulai Request ke AI...");
-
   try {
-    // KUNCI API KAMU (Hardcoded)
-    const API_KEY = "AIzaSyAT5An_z-2A4MCl9T6V09VZyV2EXKrZ8-Q"; 
-
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    // 1. AMBIL KEY DARI ENV
+    const API_KEY = process.env.GOOGLE_API_KEY;
     
-    // --- PERBAIKAN DI SINI: Ganti model jadi 'gemini-pro' ---
-    // Model 'gemini-pro' itu versi standar yang pasti jalan.
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
+    if (!API_KEY) {
+      throw new Error("API Key tidak ditemukan di .env.local");
+    }
+    
     const body = await request.json();
     const userMessage = body.message || "Halo";
 
-    // --- INSTRUKSI SHOPORA (Kita gabung manual ke pesan user) ---
-    // Ini trik supaya AI nurut walaupun pakai model standar.
-    const SYSTEM_PROMPT = `
-    Peran: Kamu adalah CS untuk e-commerce "Shopora". Jawab singkat & ramah.
-    
-    Info Shopora:
-    - Ganti Username: Profile > Edit Profile.
-    - Link Akun: Settings > Linked Accounts.
-    - Lupa Password: Login > Lupa Password.
-    - Pembayaran: Transfer Bank, E-Wallet, Kartu Kredit.
-    - Ongkir: Gratis di atas Rp 500rb.
-    - Retur: Max 3 hari via Riwayat Pesanan.
-    
-    PENTING: Jika ditanya di luar topik Shopora, tolak dengan sopan.
-    
-    Pertanyaan User: ${userMessage}
+    const MODEL_NAME = "gemini-2.5-flash";
+
+    const prompt = `
+      Kamu adalah CS Shopora. Jawab singkat (maks 2 kalimat), ramah, profesional, dan membantu.
+      Info Shopora:
+      - Ganti Username: Menu Profile > Edit Profile.
+      - Link Akun: Settings > Linked Accounts.
+      - Lupa Password: Login > Lupa Password, konfirmasi lewat email atau nomor telepon.
+      - Ongkir: Gratis di atas Rp 500rb.
+      - Retur: Maksimal 3 hari.
+      - cara tambah alamat, bisa buka account setting, lalu my address/alamat saya, lalu isi semua yang dibutuhkan
+      - menangani masalah kurir terlambat, produk lama datang, arahkan untuk menghubungi pihak toko atau ekspedisi dengan baik baik
+
+      jika ada yang bertanya terkait masalah produk atau tokonya, arahkan untuk menghubungi tokonya dengan baik baik.
+      jangan jawab jika ada yang bertanya selain tentang platform shopora, seperti bertanya tentang project pribadi ataupun informasi yang tidak relevan.
+      
+      Pertanyaan User: ${userMessage}
     `;
+
+    // 3. KIRIM KE GOOGLE
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("❌ Error Google:", data);
+      throw new Error(data.error?.message || "Gagal connect ke Google");
+    }
+
+    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    console.log("2. Mengirim pesan ke Google...");
-
-    // Kirim prompt gabungan tadi
-    const result = await model.generateContent(SYSTEM_PROMPT);
-    const response = await result.response;
-    const text = response.text();
-
-    console.log("3. Berhasil dapat balasan!");
-
-    return NextResponse.json({ reply: text });
+    return NextResponse.json({ reply: replyText });
 
   } catch (error: any) {
-    console.error("❌ ERROR:", error.message || error);
-    
+    console.error("❌ Error Server:", error.message);
     return NextResponse.json(
-      { reply: "Maaf, server sedang sibuk. Coba lagi nanti." }, 
+      { reply: "Maaf, saya sedang pembaruan sistem." }, 
       { status: 500 }
     );
   }
