@@ -4,6 +4,7 @@ import HeroSection from "./components/HeroSection";
 import Header from "./components/Header";
 import Footer from "./components/footer"; 
 import { FakeProduct, Product } from "./lib/types";
+ 
 
 async function getProducts() {
   const res = await fetch('https://fakestoreapi.com/products', { cache: 'no-store' });
