@@ -1,6 +1,7 @@
 import React from "react";
-import { Facebook, Twitter, Linkedin, Instagram, Link } from "lucide-react";
-import { playfair, integralCF_Fonts, inter } from "../lib/font";
+import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { playfair, inter } from "../lib/font";
+import Link from "next/link";
 import Image from "next/image";
 
 const Footer: React.FC = () => {
@@ -9,7 +10,7 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div className="md:col-span-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-3">
               <Image
                 src="/logo_shopora.svg"
                 alt="Shopora Logo"
@@ -20,7 +21,7 @@ const Footer: React.FC = () => {
                 href="/"
                 className={`text-2xl font-bold text-[#1230AE] ${playfair.className}`}
               >
-                Shopodra
+                Shopora
               </Link>
             </div>
             <p className={`text-gray-600 text-sm mb-4 ${inter.className}`}>
@@ -30,25 +31,25 @@ const Footer: React.FC = () => {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#1230AE] transition-colors"
               >
                 <Twitter size={20} className="text-gray-700" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#1230AE] transition-colors"
               >
                 <Facebook size={20} className="text-gray-700" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="hover:bg-[#1230AE] w-10 h-10 bg-white rounded-full flex items-center justify-center transition-colors"
               >
-                <Linkedin size={20} className="text-gray-700" />
+                <Linkedin size={20} className="text-gray-700 " />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#1230AE] transition-colors"
               >
                 <Instagram size={20} className="text-gray-700" />
               </a>

@@ -109,17 +109,17 @@ const Header: React.FC = () => {
     >
       <button
         onClick={() => router.push("/login")}
-        className="text-white px-4 md:px-6 py-2 rounded-full font-medium text-sm md:text-base whitespace-nowrap"
-        style={{ backgroundColor: "#1230AE" }}
+        className=" px-4 md:px-5 py-2 rounded-xl  text-sm md:text-base whitespace-nowrap border-[#1230AE] font-bold text-[#1230AE] border-2"
       >
         Login
       </button>
-      <Link
-        href="/signup"
-        className="rounded-xl bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800 whitespace-nowrap hidden sm:block"
+      <button
+        onClick={() => router.push("/signup")}
+        className="text-white px-4 md:px-5 py-2 rounded-xl font-medium text-sm md:text-base whitespace-nowrap"
+        style={{ backgroundColor: "#1230AE" }}
       >
         Sign Up
-      </Link>
+      </button>
     </div>
   );
 
@@ -176,13 +176,22 @@ const Header: React.FC = () => {
                   isSearchFocused ? "opacity-0 hidden" : "opacity-100 flex"
                 }`}
               >
-                <Link href="/onsale" className="hover:text-gray-600">
+                <Link
+                  href="/onsale"
+                  className="hover:text-[#1230AE] hover:underline transition-all duration-150"
+                >
                   On Sale
                 </Link>
-                <Link href="/new_arrivals" className="hover:text-gray-600">
+                <Link
+                  href="/new_arrivals"
+                  className="hover:text-[#1230AE] hover:underline transition-all duration-150"
+                >
                   New Arrivals
                 </Link>
-                <Link href="/brands" className="hover:text-gray-600">
+                <Link
+                  href="/brands"
+                  className="hover:text-[#1230AE] hover:underline transition-all duration-150"
+                >
                   Brands
                 </Link>
               </nav>
