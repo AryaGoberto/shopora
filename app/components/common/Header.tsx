@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 // Local Imports
-import { playfair } from "../lib/font";
+import { playfair } from "../../lib/font";
 
 const Header: React.FC = () => {
   // --- State Hooks ---

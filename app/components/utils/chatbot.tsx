@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Maximize2, Minimize2 } from "lucide-react";
-import { inter, playfair } from "../lib/font";
+import { inter, playfair } from "../../lib/font";
 import Image from "next/image";
 import Link from "next/link";
 

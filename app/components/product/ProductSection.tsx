@@ -3,7 +3,7 @@
 import React from "react";
 import ProductCard from "./ProductCard";
 // Impor tipe data Product dari lokasi aslinya
-import { Product } from "../lib/types";
+import { Product } from "../../lib/types";
 
 interface ProductSectionProps {
   title: string;

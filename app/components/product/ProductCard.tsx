@@ -1,7 +1,7 @@
 // components/ProductCard.tsx
 import React from "react";
 import { Star } from "lucide-react";
-import { Product } from "../lib/types"; // Sesuaikan path import type kamu
+import { Product } from "../../lib/types"; // Sesuaikan path import type kamu
 import Image from "next/image";
 
 const renderStars = (rating: number) => {
@@ -11,7 +11,7 @@ const renderStars = (rating: number) => {
   const hasHalfStar = rating % 1 !== 0; // Cek apakah ada pecahan (misal: 4.5)
 
   for (let i = 0; i < maxStars; i++) {
-    let starClass = "text-gray-300"; 
+    let starClass = "text-gray-300";
     let isFilled = false;
 
     if (i < fullStars) {
@@ -38,8 +38,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
       <Image
         src={product.image}
         alt={product.name}
-        width={300} 
-        height={300} 
+        width={300}
+        height={300}
         className="object-contain h-full w-full mix-blend-multiply group-hover:scale-110 transition-transform duration-300"
       />
       {product.discount && (

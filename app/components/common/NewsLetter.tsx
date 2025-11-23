@@ -1,7 +1,7 @@
 // app/components/Newsletter.tsx
 import React from "react";
 import { Mail } from "lucide-react";
-import {integralCF_Fonts} from "../lib/font";
+import { integralCF_Fonts } from "../../lib/font";
 
 const Newsletter: React.FC = () => (
   <section className="max-w-7xl mx-auto px-4 py-16">
@@ -12,7 +12,9 @@ const Newsletter: React.FC = () => (
     >
       {/* KIRI: Judul (Teks) */}
       <div className="md:w-1/2">
-        <h2 className={`text-3xl md:text-4xl font-extrabold text-white leading-tight ${integralCF_Fonts.className}`}>
+        <h2
+          className={`text-3xl md:text-4xl font-extrabold text-white leading-tight ${integralCF_Fonts.className}`}
+        >
           STAY UP TO DATE ABOUT
           <br />
           OUR LATEST OFFERS

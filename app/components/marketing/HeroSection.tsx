@@ -1,14 +1,16 @@
 "use client";
 
 import React from "react";
-import { integralCF_Fonts } from "../lib/font";
+import { integralCF_Fonts } from "../../lib/font";
 
 const HeroSection: React.FC = () => {
   return (
     <section className="bg-gray-100 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 py-12 md:py-24 grid md:grid-cols-2 gap-8 items-center">
         <div>
-          <h2 className={`text-3xl md:text-6xl font-black mb-4 md:mb-6 leading-tight ${integralCF_Fonts.className}`}>
+          <h2
+            className={`text-3xl md:text-6xl font-black mb-4 md:mb-6 leading-tight ${integralCF_Fonts.className}`}
+          >
             FIND CLOTHES
             <br />
             THAT MATCHES
