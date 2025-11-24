@@ -11,14 +11,14 @@ import {
   Mail,
 } from "lucide-react";
 import Image from "next/image";
-import Footer from "../components/footer";
-import Header from "../components/Header";
-import Newsletter from "../components/NewsLetter";
-import TopBanner from "../components/TopBanner";
-import ProductSection from "../components/ProductSection";
+import Footer from "../components/common/footer";
+import Header from "../components/common/Header";
+import Newsletter from "../components/common/NewsLetter";
+import TopBanner from "../components/common/TopBanner";
+import ProductSection from "../components/product/ProductSection";
 import { products } from "../lib/mock";
 import { getProductsData } from "../lib/productService";
-import SaleBanner from "../components/SaleBanner";
+import SaleBanner from "../components/marketing/SaleBanner";
 
 // --- HALAMAN UTAMA ---
 

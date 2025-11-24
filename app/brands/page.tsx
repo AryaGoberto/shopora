@@ -2,11 +2,11 @@
 // HAPUS: "use client";
 
 import React from "react"; // Hapus import useState, dll.
-import Header from "../components/Header";
-import Footer from "../components/footer";
-import TopBrandBanner from "../components/TopBrandBanner";
-import ProductSection from "../components/ProductSection";
-import Newsletter from "../components/NewsLetter";
+import Header from "../components/common/Header";
+import Footer from "../components/common/footer";
+import TopBrandBanner from "../components/marketing/TopBrandBanner";
+import ProductSection from "../components/product/ProductSection";
+import Newsletter from "../components/common/NewsLetter";
 import { getProductsData } from "../lib/productService";
 export default async function BrandsPage() {
   const allProducts = await getProductsData();

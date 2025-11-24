@@ -14,7 +14,7 @@ import {
   Minus,
   Search,
 } from "lucide-react";
-import Newsletter from "../components/NewsLetter";
+import Newsletter from "../components/common/NewsLetter";
 
 // --- MOCK DATA ---
 const currentProduct = {

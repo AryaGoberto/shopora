@@ -1,10 +1,10 @@
-import HeroSection from "./components/HeroSection";
-import Header from "./components/Header";
-import Footer from "./components/footer";
+import HeroSection from "./components/marketing/HeroSection";
+import Header from "./components/common/Header";
+import Footer from "./components/common/footer";
 import { getProductsData } from "./lib/productService";
-import TopBanner from "./components/TopBanner";
-import ProductSection from "./components/ProductSection";
-import Newsletter from "./components/NewsLetter";
+import TopBanner from "./components/common/TopBanner";
+import ProductSection from "./components/product/ProductSection";
+import Newsletter from "./components/common/NewsLetter";
 
 export default async function Home() {
   const products = await getProductsData();

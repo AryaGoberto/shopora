@@ -1,10 +1,10 @@
-import Header from "../components/Header";
-import TopBanner from "../components/TopBanner";
-import Newsletter from "../components/NewsLetter";
-import Footer from "../components/footer";
-import ProductSection from "../components/ProductSection";
+import Header from "../components/common/Header";
+import TopBanner from "../components/common/TopBanner";
+import Newsletter from "../components/common/NewsLetter";
+import Footer from "../components/common/footer";
+import ProductSection from "../components/product/ProductSection";
 import { getProductsData } from "../lib/productService";
-import NewArrivalsBanner from "../components/NewArrivalBanner";
+import NewArrivalsBanner from "../components/marketing/NewArrivalBanner";
 
 export default async function NewArrivalsPage() {
   const products = await getProductsData();
@@ -15,7 +15,7 @@ export default async function NewArrivalsPage() {
       <NewArrivalsBanner />
       <ProductSection
         title="Top Selling"
-        products={products.slice(8, 16)} 
+        products={products.slice(8, 16)}
         viewAllLink="/shop/top-selling"
       />
       <Newsletter />

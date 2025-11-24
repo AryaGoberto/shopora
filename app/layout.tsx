@@ -3,7 +3,7 @@ import "./globals.css";
 import { inter as Inter } from "./lib/font";
 
 // 1. IMPORT CHATBOT DI SINI
-import ChatBot from "./components/chatbot"; 
+import ChatBot from "./components/utils/chatbot"; 
 
 export default function RootLayout({
   children,
