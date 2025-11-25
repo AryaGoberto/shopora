@@ -2,15 +2,18 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { auth, db } from "../lib/firebase";
+import { useRouter } from "next/navigation";
+import { auth } from "../lib/firebase";
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   User,
 } from "firebase/auth";
-import { getDoc, doc } from "firebase/firestore";
 import { Admin } from "../lib/types";
+
+// Hardcoded admin UID for direct verification
+const ADMIN_UID = "t6DlGbQufgf2xeMSF4ZF8l9Z3L53";
 
 interface AdminContextType {
   adminUser: User | null;
@@ -24,6 +27,7 @@ interface AdminContextType {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const router = useRouter();
   const [adminUser, setAdminUser] = useState<User | null>(null);
   const [adminData, setAdminData] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,24 +36,20 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Check apakah user adalah admin — hanya untuk mengisi adminData jika ada
-        const adminDocRef = doc(db, "admins", user.uid);
-        const adminDocSnap = await getDoc(adminDocRef);
-
-        if (adminDocSnap.exists()) {
-          const data = adminDocSnap.data();
+        // Check if UID matches admin UID
+        if (user.uid === ADMIN_UID) {
           setAdminData({
-            id: adminDocSnap.id,
-            email: data.email,
-            storeName: data.storeName,
-            storeDescription: data.storeDescription,
-            storeImage: data.storeImage,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date(),
+            id: user.uid,
+            email: user.email || "",
+            storeName: "Admin Store",
+            storeDescription: "",
+            storeImage: "",
+            createdAt: new Date(),
+            updatedAt: new Date(),
           });
           setAdminUser(user);
         } else {
-          // Jika user bukan admin, jangan melakukan signOut global — biarkan Auth utama menangani sesi.
+          // Not an admin
           setAdminUser(null);
           setAdminData(null);
         }
@@ -68,26 +68,23 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setIsLoading(true);
       const result = await signInWithEmailAndPassword(auth, email, password);
 
-      // Verify admin exists
-      const adminDocRef = doc(db, "admins", result.user.uid);
-      const adminDocSnap = await getDoc(adminDocRef);
-
-      if (!adminDocSnap.exists()) {
+      // Verify UID matches admin UID
+      if (result.user.uid !== ADMIN_UID) {
         await signOut(auth);
-        throw new Error("User bukan admin Shopora");
+        throw new Error("❌ UID tidak cocok dengan admin yang terdaftar");
       }
 
-      const data = adminDocSnap.data();
       setAdminData({
-        id: adminDocSnap.id,
-        email: data.email,
-        storeName: data.storeName,
-        storeDescription: data.storeDescription,
-        storeImage: data.storeImage,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
+        id: result.user.uid,
+        email: result.user.email || "",
+        storeName: "Admin Store",
+        storeDescription: "",
+        storeImage: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
       setAdminUser(result.user);
+      console.log("✅ Admin login successful:", result.user.uid);
     } catch (error) {
       console.error("❌ Login error:", error);
       throw error;
@@ -102,6 +99,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await signOut(auth);
       setAdminUser(null);
       setAdminData(null);
+      router.push("/");
     } catch (error) {
       console.error("❌ Logout error:", error);
       throw error;

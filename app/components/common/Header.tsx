@@ -164,6 +164,8 @@ const Header: React.FC = () => {
         )}
       </div>
 
+      {/* Add Catalog removed per request */}
+
       {/* Profile button + dropdown */}
       <div ref={profileRef} className="relative">
         <button
@@ -225,13 +227,6 @@ const Header: React.FC = () => {
           : "flex scale-100 opacity-100 w-auto"
       }`}
     >
-      {/* Show Admin link only when not logged in (regular users shouldn't see it when logged in) */}
-      <Link
-        href="/admin/login"
-        className="text-xs md:text-sm text-gray-600 hover:text-[#1230AE] transition-colors font-medium"
-      >
-        Admin
-      </Link>
       <button
         onClick={() => router.push("/login")}
         className="px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm whitespace-nowrap border-2 border-[#1230AE] font-semibold text-[#1230AE] hover:bg-blue-50 transition-colors"
