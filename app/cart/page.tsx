@@ -1,46 +1,62 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CartItem from "../components/checkout/CartItem";
 import OrderSummary from "../components/checkout/OrderSummary";
 import Header from "../components/common/Header";
 import Footer from "../components/common/footer";
 import Newsletter from "../components/common/NewsLetter";
 import { CartItemType } from "../lib/types";
-
-// Data Awal (Mocking)
-const initialCartItems: CartItemType[] = [
-  {
-    id: "1",
-    name: "Gradient Graphic T-shirt",
-    size: "Large",
-    color: "White",
-    price: 145,
-    image: "https://placehold.co/120x120/png?text=T-Shirt",
-    quantity: 1,
-  },
-  {
-    id: "2",
-    name: "Checkered Shirt",
-    size: "Medium",
-    color: "Red",
-    price: 180,
-    image: "https://placehold.co/120x120/png?text=Shirt",
-    quantity: 1,
-  },
-  {
-    id: "3",
-    name: "Skinny Fit Jeans",
-    size: "Large",
-    color: "Blue",
-    price: 240,
-    image: "https://placehold.co/120x120/png?text=Jeans",
-    quantity: 1,
-  },
-];
+import { getCart, saveCart } from "../lib/cart";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const stored = getCart();
+    // mark as external load so we don't immediately re-save and cause event loop
+    skipSaveRef.current = true;
+    setCartItems(stored);
+  }, []);
+
+  // Listen for cart changes (other tabs or saveCart dispatch)
+  useEffect(() => {
+    const handleUpdate = () => {
+      const stored = getCart();
+      // mark to skip saving since this came from external source
+      skipSaveRef.current = true;
+      setCartItems(stored);
+    };
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === "shopora_cart") {
+        skipSaveRef.current = true;
+        handleUpdate();
+      }
+    };
+
+    window.addEventListener("cart_updated", handleUpdate as EventListener);
+    window.addEventListener("storage", onStorage as EventListener);
+
+    return () => {
+      window.removeEventListener("cart_updated", handleUpdate as EventListener);
+      window.removeEventListener("storage", onStorage as EventListener);
+    };
+  }, []);
+
+  // Persist changes to localStorage
+  // If the cart was just updated from an external source, skip the immediate save
+  const skipSaveRef = useRef(false);
+
+  useEffect(() => {
+    if (skipSaveRef.current) {
+      // reset flag and do not save (prevents loop)
+      skipSaveRef.current = false;
+      return;
+    }
+    saveCart(cartItems);
+  }, [cartItems]);
 
   // --- CRUD LOGIC ---
 
@@ -93,7 +109,7 @@ export default function CartPage() {
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem
-                  key={item.id}
+                  key={`${item.id}-${item.size || ""}-${item.color || ""}`}
                   item={item}
                   onIncrease={handleIncreaseQuantity}
                   onDecrease={handleDecreaseQuantity}
