@@ -107,6 +107,12 @@ const Header: React.FC = () => {
           : "flex scale-100 opacity-100 w-auto"
       }`}
     >
+      <Link
+        href="/admin/login"
+        className="text-sm text-gray-600 hover:text-[#1230AE] transition-colors"
+      >
+        Admin
+      </Link>
       <button
         onClick={() => router.push("/login")}
         className=" px-4 md:px-5 py-2 rounded-xl  text-sm md:text-base whitespace-nowrap border-[#1230AE] font-bold text-[#1230AE] border-2"

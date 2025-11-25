@@ -42,9 +42,10 @@ const SignupPage: React.FC = () => {
       router.push("/login");
     } catch (err: unknown) {
       console.error("❌ Error registering user:", err);
-      if (err.code === "auth/email-already-in-use") {
+      const e = err as any;
+      if (e && e.code === "auth/email-already-in-use") {
         setError("Email sudah terdaftar.");
-      } else if (err.code === "auth/weak-password") {
+      } else if (e && e.code === "auth/weak-password") {
         setError("Password minimal 6 karakter.");
       } else {
         setError("Gagal mendaftar. Coba lagi nanti.");
