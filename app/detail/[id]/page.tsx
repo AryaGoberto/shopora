@@ -231,7 +231,7 @@ export default function ProductDetailPage() {
               />
             </div>
 
-            {/* Thumbnails - hanya 1 gambar untuk sekarang */}
+            {/* Thumbnails - hanya 1 gambar untuk sekarang
             <div className="flex flex-col space-y-3 w-20 sm:w-28">
               <div
                 className="w-full h-24 sm:h-32 rounded-lg cursor-pointer overflow-hidden border-2 border-[#1230AE] shadow-md"
@@ -245,7 +245,7 @@ export default function ProductDetailPage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* RIGHT: PRODUCT INFO & CHECKOUT */}
