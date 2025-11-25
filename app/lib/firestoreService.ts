@@ -36,6 +36,7 @@ export async function getProducts(): Promise<Product[]> {
         image: data.image,
         description: data.description,
         category: data.category,
+        brand: data.brand ? String(data.brand).trim() : undefined,
         rating: data.rating || 0,
         reviewCount: data.reviewCount || 0,
         sizes: data.sizes || [],
@@ -80,6 +81,7 @@ export async function getProductById(productId: string): Promise<Product | null>
       image: data.image,
       description: data.description,
       category: data.category,
+      brand: data.brand ? String(data.brand).trim() : undefined,
       rating: data.rating || 0,
       reviewCount: data.reviewCount || 0,
       sizes: data.sizes || [],
@@ -117,6 +119,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
         image: data.image,
         description: data.description,
         category: data.category,
+        brand: data.brand ? String(data.brand).trim() : undefined,
         rating: data.rating || 0,
         reviewCount: data.reviewCount || 0,
         sizes: data.sizes || [],
@@ -157,6 +160,7 @@ export async function getProductsByAdminId(adminId: string): Promise<Product[]> 
         image: data.image,
         description: data.description,
         category: data.category,
+        brand: data.brand ? String(data.brand).trim() : undefined,
         rating: data.rating || 0,
         reviewCount: data.reviewCount || 0,
         sizes: data.sizes || [],
@@ -203,6 +207,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
       if (product.colors && product.colors.length > 0) {
         haystackParts.push(product.colors.map((c) => c.name).join(" "));
       }
+      if (product.brand) haystackParts.push(product.brand);
       if (product.discount) haystackParts.push(product.discount.toString());
       // include price as string so numeric searches like "199" can match
       if (product.price !== undefined && product.price !== null)
@@ -233,6 +238,7 @@ export async function addProduct(
       updatedAt: new Date(),
       isNewArrival: (product as any).isNewArrival || false,
       isOnSale: (product as any).isOnSale || false,
+      brand: (product as any).brand ? String((product as any).brand).trim() : undefined,
     });
 
     console.log("✅ Product added with ID:", docRef.id);
@@ -257,6 +263,7 @@ export async function updateProduct(
       updatedAt: new Date(),
       ...(updates.isNewArrival !== undefined ? { isNewArrival: updates.isNewArrival } : {}),
       ...(updates.isOnSale !== undefined ? { isOnSale: updates.isOnSale } : {}),
+      ...(updates.brand !== undefined ? { brand: updates.brand ? String(updates.brand).trim() : undefined } : {}),
     });
 
     console.log("✅ Product updated:", productId);
