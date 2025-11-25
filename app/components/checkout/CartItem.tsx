@@ -1,6 +1,15 @@
 import React from "react";
 import Image from "next/image";
 import { Trash2, Minus, Plus } from "lucide-react";
+import { CartItemType } from "../../lib/types";
+
+interface CartItemProps {
+  item: CartItemType;
+  onIncrease: (id: string) => void;
+  onDecrease: (id: string) => void;
+  onRemove: (id: string) => void;
+}
+
 export default function CartItem({
   item,
   onIncrease,

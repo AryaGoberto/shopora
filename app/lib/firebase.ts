@@ -21,3 +21,23 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export default app;
+
+// Runtime checks to help debug common misconfigurations
+try {
+  const bucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  if (!bucket) {
+    // eslint-disable-next-line no-console
+    console.warn("⚠️ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET is not set. File uploads will fail.");
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`Firebase storage bucket configured: ${bucket}`);
+    if (bucket.includes("firebasestorage.app")) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "⚠️ The storage bucket value looks unusual. Default bucket usually ends with `appspot.com`.\nIf uploads fail, try setting NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<your-project-id>.appspot.com in .env.local"
+      );
+    }
+  }
+} catch (e) {
+  // ignore runtime check errors
+}

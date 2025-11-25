@@ -6,11 +6,12 @@ import OrderSummary from "../components/checkout/OrderSummary";
 import Header from "../components/common/Header";
 import Footer from "../components/common/footer";
 import Newsletter from "../components/common/NewsLetter";
+import { CartItemType } from "../lib/types";
 
 // Data Awal (Mocking)
-const initialCartItems = [
+const initialCartItems: CartItemType[] = [
   {
-    id: 1,
+    id: "1",
     name: "Gradient Graphic T-shirt",
     size: "Large",
     color: "White",
@@ -19,7 +20,7 @@ const initialCartItems = [
     quantity: 1,
   },
   {
-    id: 2,
+    id: "2",
     name: "Checkered Shirt",
     size: "Medium",
     color: "Red",
@@ -28,7 +29,7 @@ const initialCartItems = [
     quantity: 1,
   },
   {
-    id: 3,
+    id: "3",
     name: "Skinny Fit Jeans",
     size: "Large",
     color: "Blue",
@@ -44,7 +45,7 @@ export default function CartPage() {
   // --- CRUD LOGIC ---
 
   // 1. UPDATE: Increase Quantity
-  const handleIncreaseQuantity = (id: number) => {
+  const handleIncreaseQuantity = (id: string) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
@@ -53,7 +54,7 @@ export default function CartPage() {
   };
 
   // 2. UPDATE: Decrease Quantity (Min 1)
-  const handleDecreaseQuantity = (id: number) => {
+  const handleDecreaseQuantity = (id: string) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === id && item.quantity > 1
@@ -64,7 +65,7 @@ export default function CartPage() {
   };
 
   // 3. DELETE: Remove Item
-  const handleRemoveItem = (id: number) => {
+  const handleRemoveItem = (id: string) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
