@@ -32,7 +32,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Check apakah user adalah admin
+        // Check apakah user adalah admin — hanya untuk mengisi adminData jika ada
         const adminDocRef = doc(db, "admins", user.uid);
         const adminDocSnap = await getDoc(adminDocRef);
 
@@ -49,8 +49,7 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           });
           setAdminUser(user);
         } else {
-          // User login tapi bukan admin
-          await signOut(auth);
+          // Jika user bukan admin, jangan melakukan signOut global — biarkan Auth utama menangani sesi.
           setAdminUser(null);
           setAdminData(null);
         }
