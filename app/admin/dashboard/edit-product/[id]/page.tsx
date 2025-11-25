@@ -31,6 +31,8 @@ export default function EditProductPage() {
     stock: "",
     sizes: "",
     colors: "",
+    isNewArrival: false,
+    isOnSale: false,
   });
 
   const [error, setError] = useState("");
@@ -85,6 +87,8 @@ export default function EditProductPage() {
         stock: (product.stock || 0).toString(),
         sizes: product.sizes?.join(", ") || "",
         colors: colorString,
+        isNewArrival: !!product.isNewArrival,
+        isOnSale: !!product.isOnSale,
       });
     } catch (err) {
       console.error("Error loading product:", err);
@@ -104,6 +108,11 @@ export default function EditProductPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,6 +157,8 @@ export default function EditProductPage() {
         stock: parseInt(formData.stock) || 0,
         sizes: sizes.length > 0 ? sizes : undefined,
         colors: colors.length > 0 ? colors : undefined,
+        isNewArrival: formData.isNewArrival,
+        isOnSale: formData.isOnSale,
       };
 
       await updateProduct(productId, updates);
@@ -417,6 +428,37 @@ export default function EditProductPage() {
               <p className="text-xs text-gray-500 mt-1">
                 Contoh: Red:#FF0000; Blue:#0000FF; Green:#00FF00
               </p>
+            </div>
+          </div>
+
+          {/* Flags: New Arrival, On Sale */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="isNewArrival"
+                name="isNewArrival"
+                checked={!!formData.isNewArrival}
+                onChange={handleCheckboxChange}
+                className="w-4 h-4"
+              />
+              <label htmlFor="isNewArrival" className="text-sm font-medium">
+                Tandai sebagai New Arrival (tampil di halaman New Arrivals)
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="isOnSale"
+                name="isOnSale"
+                checked={!!formData.isOnSale}
+                onChange={handleCheckboxChange}
+                className="w-4 h-4"
+              />
+              <label htmlFor="isOnSale" className="text-sm font-medium">
+                Tandai sebagai On Sale (tampil di halaman On Sale)
+              </label>
             </div>
           </div>
 

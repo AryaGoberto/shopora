@@ -31,9 +31,9 @@ export default async function HomePage() {
       <Header />
       <SaleBanner />
       <ProductSection
-        title="Top Selling"
-        products={products.slice(8, 16)} // Ambil 8 produk berikutnya
-        viewAllLink="/shop/top-selling"
+        title="On Sale"
+        products={products.filter((p) => p.isOnSale || !!p.discount)}
+        viewAllLink="/onsale"
       />
 
       <Newsletter />

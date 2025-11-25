@@ -32,6 +32,8 @@ export interface Product {
   adminId: string;               // ID admin/toko yang upload
   createdAt: Date;
   updatedAt: Date;
+  isNewArrival?: boolean;        // Optional - show in New Arrivals
+  isOnSale?: boolean;            // Optional - mark as on sale
 }
 
 // ============ ADMIN TYPE (FIRESTORE) ============
