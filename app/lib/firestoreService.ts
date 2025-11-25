@@ -44,6 +44,8 @@ export async function getProducts(): Promise<Product[]> {
         adminId: data.adminId,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
+        isNewArrival: data.isNewArrival || false,
+        isOnSale: data.isOnSale || false,
       } as Product;
     });
 
@@ -86,6 +88,8 @@ export async function getProductById(productId: string): Promise<Product | null>
       adminId: data.adminId,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
+      isNewArrival: data.isNewArrival || false,
+      isOnSale: data.isOnSale || false,
     } as Product;
   } catch (error) {
     console.error("❌ Error fetching product:", error);
@@ -121,6 +125,8 @@ export async function getProductsByCategory(category: string): Promise<Product[]
         adminId: data.adminId,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
+        isNewArrival: data.isNewArrival || false,
+        isOnSale: data.isOnSale || false,
       } as Product;
     });
 
@@ -159,6 +165,8 @@ export async function getProductsByAdminId(adminId: string): Promise<Product[]> 
         adminId: data.adminId,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
+        isNewArrival: data.isNewArrival || false,
+        isOnSale: data.isOnSale || false,
       } as Product;
     });
 
@@ -178,13 +186,33 @@ export async function searchProducts(query: string): Promise<Product[]> {
     // This is a basic client-side filter. Untuk production, gunakan Firestore full-text search atau Algolia
     const allProducts = await getProducts();
 
-    const lowerQuery = query.toLowerCase();
-    return allProducts.filter(
-      (product) =>
-        product.name.toLowerCase().includes(lowerQuery) ||
-        product.category.toLowerCase().includes(lowerQuery) ||
-        product.description.toLowerCase().includes(lowerQuery)
-    );
+    const lowerQuery = query.toLowerCase().trim();
+    if (!lowerQuery) return [];
+
+    // split into tokens so multi-word searches are handled
+    const tokens = lowerQuery.split(/\s+/).filter(Boolean);
+
+    return allProducts.filter((product) => {
+      const haystackParts: string[] = [];
+      haystackParts.push(product.name || "");
+      haystackParts.push(product.category || "");
+      haystackParts.push(product.description || "");
+      if (product.sizes && product.sizes.length > 0) {
+        haystackParts.push(product.sizes.join(" "));
+      }
+      if (product.colors && product.colors.length > 0) {
+        haystackParts.push(product.colors.map((c) => c.name).join(" "));
+      }
+      if (product.discount) haystackParts.push(product.discount.toString());
+      // include price as string so numeric searches like "199" can match
+      if (product.price !== undefined && product.price !== null)
+        haystackParts.push(String(product.price));
+
+      const haystack = haystackParts.join(" ").toLowerCase();
+
+      // require that all tokens appear somewhere in the haystack
+      return tokens.every((t) => haystack.includes(t));
+    });
   } catch (error) {
     console.error("❌ Error searching products:", error);
     return [];
@@ -203,6 +231,8 @@ export async function addProduct(
       ...product,
       createdAt: new Date(),
       updatedAt: new Date(),
+      isNewArrival: (product as any).isNewArrival || false,
+      isOnSale: (product as any).isOnSale || false,
     });
 
     console.log("✅ Product added with ID:", docRef.id);
@@ -225,6 +255,8 @@ export async function updateProduct(
     await updateDoc(docRef, {
       ...updates,
       updatedAt: new Date(),
+      ...(updates.isNewArrival !== undefined ? { isNewArrival: updates.isNewArrival } : {}),
+      ...(updates.isOnSale !== undefined ? { isOnSale: updates.isOnSale } : {}),
     });
 
     console.log("✅ Product updated:", productId);

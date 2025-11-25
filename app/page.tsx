@@ -16,13 +16,18 @@ export default async function Home() {
 
       <ProductSection
         title="New Arrivals"
-        products={products.slice(0, 8)} // Ambil 8 produk pertama
-        viewAllLink="/shop/new-arrivals"
+        products={products.filter((p) => p.isNewArrival).slice(0, 8)}
+        viewAllLink="/new_arrivals"
       />
       <ProductSection
         title="Top Selling"
         products={products.slice(8, 16)} // Ambil 8 produk berikutnya
         viewAllLink="/shop/top-selling"
+      />
+      <ProductSection
+        title="On Sale"
+        products={products.filter((p) => p.isOnSale || !!p.discount).slice(0, 8)}
+        viewAllLink="/onsale"
       />
       <Newsletter />
       <Footer />

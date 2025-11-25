@@ -14,9 +14,9 @@ export default async function NewArrivalsPage() {
       <Header />
       <NewArrivalsBanner />
       <ProductSection
-        title="Top Selling"
-        products={products.slice(8, 16)}
-        viewAllLink="/shop/top-selling"
+        title="New Arrivals"
+        products={products.filter((p) => p.isNewArrival)}
+        viewAllLink="/new_arrivals"
       />
       <Newsletter />
       <Footer />
