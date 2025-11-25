@@ -1,16 +1,37 @@
 // app/brands/page.tsx
 // HAPUS: "use client";
 
-import React from "react"; // Hapus import useState, dll.
+import React from "react";
 import Header from "../components/common/Header";
 import Footer from "../components/common/footer";
 import TopBrandBanner from "../components/marketing/TopBrandBanner";
 import ProductSection from "../components/product/ProductSection";
 import Newsletter from "../components/common/NewsLetter";
+import BrandFilter from "../components/brands/BrandFilter";
 import { getProductsData } from "../lib/productService";
-export default async function BrandsPage() {
+
+type Props = { searchParams?: { brand?: string } };
+
+export default async function BrandsPage({ searchParams }: Props) {
   const allProducts = await getProductsData();
-  const products = allProducts.slice(0, 12);
+
+  // Collect unique brands (non-empty) and sort
+  const brandSet = new Set<string>();
+  allProducts.forEach((p) => {
+    if (p.brand && p.brand.trim()) brandSet.add(p.brand.trim());
+  });
+  const brands = Array.from(brandSet).sort((a, b) => a.localeCompare(b));
+
+  // `searchParams` may be a Promise in some Next.js contexts — unwrap safely
+  const params = (await Promise.resolve(searchParams)) || {};
+  const rawSelected = params?.brand;
+  const selectedBrand = rawSelected ? String(rawSelected).trim() : undefined;
+
+  const filtered = selectedBrand
+    ? allProducts.filter((p) => (p.brand || "").trim().toLowerCase() === selectedBrand.toLowerCase())
+    : allProducts;
+
+  const products = filtered.slice(0, 24);
 
   return (
     <div className="min-h-screen bg-white">
@@ -18,24 +39,16 @@ export default async function BrandsPage() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <TopBrandBanner />
         <section className="mb-12">
-          <div className="flex items-center gap-4 border-b pb-4 mb-6">
-            <span className="font-bold text-lg">Filter Merek:</span>
-            <button className="px-4 py-2 bg-blue-900 text-white rounded-full text-sm">
-              Semua
-            </button>
-            <button className="px-4 py-2 border rounded-full text-sm hover:bg-gray-50">
-              ZARA
-            </button>
-            <button className="px-4 py-2 border rounded-full text-sm hover:bg-gray-50">
-              VERSACE
-            </button>
+          <div className="border-b pb-4 mb-6">
+            <span className="font-bold text-lg inline-block mb-3">Filter Merek:</span>
+            <BrandFilter brands={brands} selectedBrand={selectedBrand} />
           </div>
         </section>
 
         <ProductSection
-          title="Top Selling"
-          products={products} // Gunakan data yang sudah diambil
-          viewAllLink="/shop/top-selling"
+          title={selectedBrand ? `Merek: ${selectedBrand}` : "Top Brands"}
+          products={products}
+          viewAllLink="/brands"
         />
       </main>
       <Newsletter />

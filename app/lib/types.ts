@@ -34,6 +34,7 @@ export interface Product {
   updatedAt: Date;
   isNewArrival?: boolean;        // Optional - show in New Arrivals
   isOnSale?: boolean;            // Optional - mark as on sale
+  brand?: string;                // Optional - brand label for product
 }
 
 // ============ ADMIN TYPE (FIRESTORE) ============

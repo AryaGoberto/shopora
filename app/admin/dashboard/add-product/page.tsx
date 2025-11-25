@@ -20,6 +20,7 @@ export default function AddProductPage() {
     discount: "",
     description: "",
     category: "electronics",
+    brand: "",
     image: "",
     rating: "0",
     stock: "",
@@ -100,6 +101,7 @@ export default function AddProductPage() {
         discount: formData.discount || undefined,
         description: formData.description,
         category: formData.category,
+        brand: formData.brand ? formData.brand.trim() : undefined,
         image: formData.image,
         rating: parseFloat(formData.rating) || 0,
         stock: parseInt(formData.stock) || 0,
@@ -205,6 +207,21 @@ export default function AddProductPage() {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="contoh: ONE LIFE GRAPHIC T-SHIRT"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              {/* Brand */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Brand
+                </label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={formData.brand}
+                  onChange={handleInputChange}
+                  placeholder="contoh: Nike, Adidas"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
