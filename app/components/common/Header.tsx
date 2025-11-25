@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { getCart } from "../../lib/cart";
 import { useAdmin } from "../../context/AdminContext";
 
 // Components / Icons
@@ -38,6 +39,7 @@ const Header: React.FC = () => {
   // --- Router & Refs ---
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [cartCount, setCartCount] = useState<number>(0);
 
   // --- Data ---
   const searchHistory = ["Mens Casual", "Jewelery", "White Gold", "SanDisk"];
@@ -77,6 +79,36 @@ const Header: React.FC = () => {
     });
 
     return () => unsub();
+  }, []);
+
+  // Cart count: read from localStorage and listen for updates
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const items = getCart();
+        const total = items.reduce((acc, it) => acc + (it.quantity || 0), 0);
+        setCartCount(total);
+      } catch (e) {
+        setCartCount(0);
+      }
+    };
+
+    // initial
+    updateCount();
+
+    // handlers
+    const onCustom = () => updateCount();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === "shopora_cart") updateCount();
+    };
+
+    window.addEventListener("cart_updated", onCustom as EventListener);
+    window.addEventListener("storage", onStorage as EventListener);
+
+    return () => {
+      window.removeEventListener("cart_updated", onCustom as EventListener);
+      window.removeEventListener("storage", onStorage as EventListener);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -134,8 +166,13 @@ const Header: React.FC = () => {
           : "flex scale-100 opacity-100 w-auto"
       }`}
     >
-      <Link href="/cart" className="hover:text-[#1230AE] text-gray-700 p-2 rounded-md transition-colors">
+      <Link href="/cart" className="hover:text-[#1230AE] text-gray-700 p-2 rounded-md transition-colors relative">
         <ShoppingCart size={20} />
+        {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+            {cartCount > 99 ? "99+" : cartCount}
+          </span>
+        )}
       </Link>
 
       <Link

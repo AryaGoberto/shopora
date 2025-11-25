@@ -20,6 +20,8 @@ import {
 import Newsletter from "../../components/common/NewsLetter";
 import { getProductById } from "../../lib/firestoreService";
 import { Product } from "../../lib/types";
+import { addToCart } from "../../lib/cart";
+import { useRouter } from "next/navigation";
 
 const mockReviews = [
   {
@@ -95,6 +97,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState("");
+  const router = useRouter();
 
   // Load product
   useEffect(() => {
@@ -353,6 +356,21 @@ export default function ProductDetailPage() {
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "#1230AE")
                 }
+                onClick={() => {
+                  if (!product) return;
+                  const item = {
+                    id: product.id,
+                    name: product.name,
+                    size: selectedSize || undefined,
+                    color: selectedColor || undefined,
+                    price: product.price,
+                    image: product.image,
+                    quantity,
+                  };
+                  addToCart(item as any);
+                  // small feedback then stay on page
+                  alert("Added to cart");
+                }}
               >
                 <ShoppingCart size={20} />
                 <span>Add to Cart</span>
