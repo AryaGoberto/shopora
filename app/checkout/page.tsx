@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
 import { ChevronLeft, MapPin, Bell, Building2, Smartphone, CheckCircle2, Truck, CreditCard, X } from 'lucide-react';
@@ -49,10 +49,15 @@ export default function CheckoutPage() {
       {/* HEADER */}
       <header className="bg-white sticky top-0 z-30 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-2">
-          <Link href="/" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition">
+          <Link
+            href="/"
+            className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
+          >
             <ChevronLeft className="w-6 h-6 text-gray-800" />
           </Link>
-          <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
+          <h1 className="text-lg font-bold text-gray-900 lg:text-xl">
+            Checkout
+          </h1>
         </div>
         <button className="p-2 -mr-2 hover:bg-gray-100 rounded-full transition relative">
           <Bell className="w-5 h-5 text-gray-800" />
@@ -166,8 +171,10 @@ export default function CheckoutPage() {
           {/* KOLOM KANAN (SUMMARY) */}
           <div className="lg:col-span-5 xl:col-span-4">
             <div className="bg-white p-5 lg:p-6 rounded-2xl border border-gray-100 shadow-sm lg:sticky lg:top-24">
-              <h2 className="font-bold text-gray-800 text-sm lg:text-lg mb-4 lg:mb-6">Order Summary</h2>
-              
+              <h2 className="font-bold text-gray-800 text-sm lg:text-lg mb-4 lg:mb-6">
+                Order Summary
+              </h2>
+
               <div className="space-y-3 text-sm lg:text-base">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Sub-total</span>
@@ -203,7 +210,7 @@ export default function CheckoutPage() {
               >
                 Finish Order & Pay
               </button>
-              
+
               <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
                 By clicking finish, you agree to our terms.
               </p>

@@ -1,6 +1,6 @@
 // lib/types.ts
 
-// Ini bentuk data mentah DARI Fake Store API
+// ============ LEGACY (untuk kompatibilitas) ============
 export interface FakeProduct {
   id: number;
   title: string;
@@ -14,13 +14,47 @@ export interface FakeProduct {
   };
 }
 
-// Ini bentuk data yang DIBUTUHKAN aplikasi kita (sesuai ProductCard)
+// ============ PRODUCT TYPE (FIRESTORE) ============
 export interface Product {
-  id: number;
-  name: string;       // Di API namanya 'title', kita ubah jadi 'name'
+  id: string;                    // Firestore doc ID
+  name: string;
+  price: number;
+  originalPrice?: number;        // Optional - harga sebelum diskon
+  discount?: string;             // Optional - label diskon (e.g., "30% OFF")
+  image: string;                 // URL gambar
+  description: string;
+  category: string;              // e.g., "electronics", "clothing", "jewelry"
+  rating?: number;               // 0-5
+  reviewCount?: number;          // Jumlah review
+  sizes?: string[];              // Optional - e.g., ["S", "M", "L", "XL"]
+  colors?: Array<{ name: string; hex: string }>; // Optional - color variants
+  stock?: number;                // Jumlah stok
+  adminId: string;               // ID admin/toko yang upload
+  createdAt: Date;
+  updatedAt: Date;
+  isNewArrival?: boolean;        // Optional - show in New Arrivals
+  isOnSale?: boolean;            // Optional - mark as on sale
+  brand?: string;                // Optional - brand label for product
+}
+
+// ============ ADMIN TYPE (FIRESTORE) ============
+export interface Admin {
+  id: string;                    // Firestore doc ID
+  email: string;
+  storeName: string;
+  storeDescription?: string;
+  storeImage?: string;           // Logo toko
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============ CART ITEM TYPE ============
+export interface CartItemType {
+  id: string;
+  name: string;
+  size?: string;
+  color?: string;
   price: number;
   image: string;
-  rating: number;     // Di API ratingnya objek, kita ambil angkanya saja
-  originalPrice?: number; // Opsional (tidak ada di API)
-  discount?: string;      // Opsional (tidak ada di API)
+  quantity: number;
 }

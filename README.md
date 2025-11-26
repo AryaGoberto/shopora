@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Shopora E-commerce Platform
 
-## Getting Started
+**Shopora** adalah platform *e-commerce* modern yang cepat, aman, dan mudah dioperasikan. Dibangun untuk memberikan pengalaman belanja yang mulus (*seamless*) bagi pelanggan dan alat manajemen yang kuat untuk penjual. Dibuat oleh tim sisfor hebat (arya, azizah, aradyzah, bryan, deiv)
+## 📖 Daftar Is
 
-First, run the development server:
+1. [Demo](#-demo--tinjauan)
+2. [Fitur Utama](#-fitur-utama)
+3. [Tech Stack](#-tech-stack)
+4. [Persiapan Lokal (Instalasi)](#-persiapan-lokal-instalasi)
+5. [Struktur Proyek](#-struktur-proyek)
+6. [Kontribusi](#-kontribusi)
+7. [Lisensi](#-lisensi)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Demo & Tinjauan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Lihat langsung bagaimana Shopora beroperasi!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **Demo Langsung:** [Link ke Vercel/Netlify Deployment Anda]
+* **Akun Demo:**
+    * **Email:** `demo@shopora.com`
+    * **Password:** `password123`
+ 
 
-## Learn More
+## 🌟 Fitur Utama
 
-To learn more about Next.js, take a look at the following resources:
+### Pengalaman Pelanggan (Frontend)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **Pencarian Cepat:** Pencarian produk yang instan dan *powerful*.
+* **Keranjang Belanja:** Manajemen kuantitas dan *checkout* yang intuitif.
+* **Autentikasi:** Login/Register dengan Google/GitHub (OAuth) dan kredensial.
+* **Review Produk:** Sistem penilaian dan ulasan yang terintegrasi.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Manajemen Toko (Admin Dashboard)
 
-## Deploy on Vercel
+* **CRUD Produk:** Tambah, Edit, Hapus produk dengan manajemen inventaris.
+* **Manajemen Pesanan:** Pembaruan status pesanan (*Pending*, *Processing*, *Shipped*).
+* **Laporan Dasar:** Grafik penjualan dan ringkasan pendapatan.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Frontend & Backend (Full-Stack):**
+* **Framework:** [Next.js](https://nextjs.org/) (Menggunakan App Router)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+* **Komponen UI:** [Shadcn/ui](https://ui.shadcn.com/) (Jika digunakan)
+* **TypeScript:** Untuk *type-safety* di seluruh proyek.
+
+**Database & Layanan:**
+* **Database:** [PostgreSQL] (melalui **Supabase** atau **Neon**)
+* **ORM:** [Prisma](https://www.prisma.io/)
+* **Autentikasi:** [NextAuth.js] atau [Clerk] (Jika digunakan)
+
+
+## 🚀 Persiapan Lokal (Instalasi)
+
+### Prasyarat
+
+* Node.js (LTS v18+)
+* Akun dan Database Supabase (atau penyedia PostgreSQL lainnya)
+* Kunci API NextAuth/Clerk
+
+### Langkah-langkah
+
+1.  **Clone Repositori**
+    ```bash
+    git clone [https://github.com/user/shopora-ecommerce.git](https://github.com/user/shopora-ecommerce.git)
+    cd shopora-ecommerce
+    ```
+
+2.  **Instal Dependensi**
+    ```bash
+    npm install
+    # atau yarn install / pnpm install
+    ```
+
+3.  **Konfigurasi Variabel Lingkungan**
+    Buat file `.env.local` di root proyek, lalu isi dengan kunci Anda:
+    ```
+    # Database
+    DATABASE_URL="postgresql://[user]:[password]@[host]:5432/[database]"
+
+    # NextAuth / Autentikasi
+    NEXTAUTH_SECRET="random_string_secret"
+    GITHUB_ID="..."
+    GITHUB_SECRET="..."
+    ```
+
+4.  **Migrasi Database**
+    Jalankan migrasi Prisma untuk membuat tabel di database Anda:
+    ```bash
+    npx prisma migrate dev --name init
+    ```
+
+5.  **Jalankan Server Pengembangan**
+    ```bash
+    npm run dev
+    ```
+    Buka `http://localhost:3000` di browser Anda.
+
+
+    ## 💚 Kontribusi
+
+Kami menyambut kontribusi! Baik itu laporan *bug*, saran fitur, atau *pull request* kode, silakan merujuk ke file [CONTRIBUTING.md](CONTRIBUTING.md) (Jika ada).
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah Lisensi MIT.

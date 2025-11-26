@@ -32,11 +32,12 @@ const LoginPage: React.FC = () => {
       router.push("/");
     } catch (err: unknown) {
       console.error("❌ Gagal login:", err);
-      if (err.code === "auth/user-not-found") {
+      const e = err as any;
+      if (e && e.code === "auth/user-not-found") {
         setError("Akun tidak ditemukan. Silakan daftar terlebih dahulu.");
-      } else if (err.code === "auth/wrong-password") {
+      } else if (e && e.code === "auth/wrong-password") {
         setError("Password salah. Coba lagi.");
-      } else if (err.code === "auth/invalid-email") {
+      } else if (e && e.code === "auth/invalid-email") {
         setError("Format email tidak valid.");
       } else {
         setError("Gagal login. Silakan coba lagi nanti.");
