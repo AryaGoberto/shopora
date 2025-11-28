@@ -29,7 +29,7 @@ export default async function HomePage() {
       <TopBanner />
 
       <Header />
-      <SaleBanner />
+      <SaleBanner imageUrl="/onsale_banner.jpg" />
       <ProductSection
         title="On Sale"
         products={products.filter((p) => p.isOnSale || !!p.discount)}

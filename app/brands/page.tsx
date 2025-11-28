@@ -4,7 +4,7 @@
 import React from "react";
 import Header from "../components/common/Header";
 import Footer from "../components/common/footer";
-import TopBrandBanner from "../components/marketing/TopBrandBanner";
+import NewArrivalsBanner from "../components/marketing/NewArrivalBanner";
 import ProductSection from "../components/product/ProductSection";
 import Newsletter from "../components/common/NewsLetter";
 import BrandFilter from "../components/brands/BrandFilter";
@@ -37,10 +37,12 @@ export default async function BrandsPage({ searchParams }: Props) {
     <div className="min-h-screen bg-white">
       <Header />
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <TopBrandBanner />
+        <NewArrivalsBanner imageUrl="/brands_banner.png" />
         <section className="mb-12">
           <div className="border-b pb-4 mb-6">
-            <span className="font-bold text-lg inline-block mb-3">Filter Merek:</span>
+            <span className="font-bold text-lg inline-block mb-3">
+              Filter Merek:
+            </span>
             <BrandFilter brands={brands} selectedBrand={selectedBrand} />
           </div>
         </section>
