@@ -20,6 +20,7 @@ import Newsletter from "../../components/common/NewsLetter";
 import { getProductById } from "../../lib/firestoreService";
 import { Product } from "../../lib/types";
 import { useCart } from "../../context/CartContext";
+import Header from "@/app/components/common/Header";
 
 // --- Helper Stars ---
 const renderStars = (rating: number, size: string = "w-5 h-5") => {
@@ -158,6 +159,8 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
+        <Header/>
+
       <div className="max-w-7xl mx-auto px-4 py-8 pt-24"> 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6">
