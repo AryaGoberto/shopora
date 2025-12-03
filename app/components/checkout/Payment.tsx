@@ -1,97 +1,185 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronLeft, Clock, CheckCircle2, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, Clock, ShieldCheck, X, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Script from 'next/script';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase'; // Sesuaikan path firebase kamu
+
+// Deklarasi Global untuk Window Snap
+declare global {
+  interface Window {
+    snap: any;
+  }
+}
 
 interface PaymentPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  orderData: any; // Kita butuh data order (totalAmount, id, dll)
 }
 
-export default function PaymentPopup({ isOpen, onClose }: PaymentPopupProps) {
-  const [copied, setCopied] = useState(false);
-  const vaNumber = "8077 1230 4567 8900";
+export default function PaymentPopup({ isOpen, onClose, orderData }: PaymentPopupProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(vaNumber.replace(/\s/g, ''));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // Jika modal tertutup atau data order belum ada, jangan render
+  if (!isOpen || !orderData) return null;
+
+  // Format Rupiah
+  const formattedPrice = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(orderData.totalAmount);
+
+  // --- FUNGSI TRIGGER MIDTRANS ---
+  const handlePayment = async () => {
+    setLoading(true);
+
+    try {
+      // 1. Minta Token ke Backend API kita sendiri
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: orderData.id || "TEST-ORDER", // Pastikan order ID ada
+          totalAmount: orderData.totalAmount,
+          customerName: orderData.customer?.firstName,
+          customerEmail: orderData.customer?.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.token) throw new Error("Gagal mendapatkan token pembayaran");
+
+      // 2. Munculkan Popup Midtrans
+      window.snap.pay(data.token, {
+        onSuccess: async function (result: any) {
+          console.log("Payment Success:", result);
+          // Update Firebase jadi PAID
+          try {
+            await updateDoc(doc(db, "orders", orderData.id), {
+              status: "paid",
+              paymentMethod: result.payment_type,
+              paidAt: new Date().toISOString(),
+              midtransInfo: result
+            });
+            // Redirect ke halaman sukses
+            router.push(`/payment-success?orderId=${orderData.id}`);
+          } catch (err) {
+            console.error("Gagal update database", err);
+          }
+        },
+        onPending: function (result: any) {
+          console.log("Payment Pending:", result);
+          alert("Menunggu pembayaran...");
+          onClose(); // Tutup modal kita, biarkan user bayar nanti
+        },
+        onError: function (result: any) {
+          console.log("Payment Error:", result);
+          alert("Pembayaran gagal!");
+          setLoading(false);
+        },
+        onClose: function () {
+          console.log("Customer closed the popup without finishing the payment");
+          setLoading(false);
+        },
+      });
+
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan sistem pembayaran.");
+      setLoading(false);
+    }
   };
 
-  // Jika isOpen false, jangan render apa-apa
-  if (!isOpen) return null;
-
   return (
-    // 1. OVERLAY HITAM (Background Dim)
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all">
-      
-      {/* 2. MODAL CONTAINER */}
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 relative max-h-[90vh] overflow-y-auto">
+    <>
+      {/* Load Script Midtrans (Wajib ada di sini atau di Layout) */}
+      <Script 
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="lazyOnload"
+      />
+
+      {/* 1. OVERLAY HITAM */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all">
         
-        {/* Header Modal */}
-        <div className="flex items-center p-4 border-b sticky top-0 bg-white z-10">
-          <button onClick={onClose} className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition">
-            <ChevronLeft className="w-6 h-6 text-gray-800" />
-          </button>
-          <h1 className="text-lg font-bold text-gray-900 ml-2 flex-1 text-center">
-            Payment Instruction
-          </h1>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <main className="p-5 space-y-6 bg-gray-50">
+        {/* 2. MODAL CONTAINER */}
+        <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 relative">
           
-          {/* Total Amount */}
-          <section className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm text-gray-500 font-medium mb-1">Total yang Harus Dibayar</p>
-                <h2 className="text-3xl font-bold text-gray-900">RP759.000</h2>
-              </div>
-              <Clock className="text-gray-400 w-5 h-5 mt-1" />
-            </div>
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-xs text-gray-400 mb-1">Batas Waktu Pembayaran</p>
-              <p className="text-sm text-gray-600 font-medium">24 Jam - s/d 25 Okt 2025</p>
-            </div>
-          </section>
+          {/* Header Modal */}
+          <div className="flex items-center p-4 border-b bg-white z-10">
+            <button onClick={onClose} className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition">
+              <ChevronLeft className="w-6 h-6 text-gray-800" />
+            </button>
+            <h1 className="text-lg font-bold text-gray-900 ml-2 flex-1 text-center">
+              Konfirmasi Pembayaran
+            </h1>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-          {/* Virtual Account Card */}
-          <section className="rounded-xl overflow-hidden shadow-md bg-white">
-            <div className="bg-blue-800 px-5 py-3">
-              <h3 className="text-white font-medium text-sm">Virtual Account - Bank BCA</h3>
-            </div>
-            <div className="p-5 border-x border-b border-gray-100 rounded-b-xl">
-              <p className="text-xs font-bold text-gray-800 mb-2">VA Number:</p>
-              <div className="flex flex-col sm:flex-row items-center gap-2 mb-6">
-                <div className="text-blue-800 font-black italic tracking-tighter text-lg mr-2">BCA</div>
-                <span className="text-2xl font-bold text-gray-800 tracking-wide text-center">{vaNumber}</span>
+          <main className="p-5 space-y-6 bg-gray-50">
+            
+            {/* Total Amount Card */}
+            <section className="bg-white border border-blue-100 rounded-xl p-5 shadow-sm text-center">
+              <p className="text-sm text-gray-500 font-medium mb-1">Total Tagihan</p>
+              <h2 className="text-3xl font-black text-blue-700 mb-2">{formattedPrice}</h2>
+              
+              <div className="flex items-center justify-center gap-2 text-xs text-orange-600 bg-orange-50 py-2 rounded-lg">
+                <Clock className="w-4 h-4" />
+                <span>Selesaikan pembayaran dalam 24 jam</span>
               </div>
-              <button 
-                onClick={handleCopy}
-                className={`w-full px-8 py-2 rounded-full text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2
-                  ${copied ? 'bg-green-500 text-white' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
-              >
-                {copied ? <><CheckCircle2 className="w-4 h-4" /> Tersalin!</> : "Salin Nomor"}
-              </button>
-            </div>
-          </section>
+            </section>
 
-          {/* Instructions */}
-          <section className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-4 text-sm">Cara Melakukan Pembayaran</h3>
-            <ol className="list-decimal list-outside ml-4 space-y-2 text-sm text-gray-600">
-              <li>Buka aplikasi/ATM BCA</li>
-              <li>Pilih "Transfer" &gt; "Virtual Account"</li>
-              <li>Masukkan Nomor VA <span className="font-bold text-gray-800">{vaNumber}</span></li>
-              <li>Konfirmasi Pembayaran</li>
-              <li>Selesai!</li>
-            </ol>
-          </section>
-        </main>
+            {/* Info Midtrans */}
+            <section className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <ShieldCheck className="w-5 h-5 text-blue-600" />
+                </div>
+                <h3 className="font-bold text-gray-900 text-sm">Metode Pembayaran Aman</h3>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Anda akan diarahkan ke sistem pembayaran otomatis Midtrans. Anda dapat memilih metode pembayaran:
+              </p>
+              <ul className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500 font-medium">
+                <li className="bg-gray-100 px-3 py-1 rounded">✅ BCA / Mandiri / BRI</li>
+                <li className="bg-gray-100 px-3 py-1 rounded">✅ GoPay / QRIS</li>
+                <li className="bg-gray-100 px-3 py-1 rounded">✅ ShopeePay</li>
+                <li className="bg-gray-100 px-3 py-1 rounded">✅ Indomaret / Alfa</li>
+              </ul>
+            </section>
+
+            {/* Tombol Bayar */}
+            <button 
+              onClick={handlePayment}
+              disabled={loading}
+              className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all
+                ${loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#1230AE] hover:bg-blue-800 hover:scale-[1.02]'
+                }`}
+            >
+              {loading ? (
+                <> <Loader2 className="animate-spin w-5 h-5" /> Memproses... </>
+              ) : (
+                "Pilih Metode Pembayaran"
+              )}
+            </button>
+
+            <p className="text-center text-[10px] text-gray-400">
+              Powered by Midtrans Payment Gateway
+            </p>
+
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

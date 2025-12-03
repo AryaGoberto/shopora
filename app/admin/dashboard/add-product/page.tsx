@@ -1,13 +1,12 @@
-// app/admin/dashboard/add-product/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { ArrowLeft, AlertCircle, CheckCircle, Upload, Loader2 } from "lucide-react";
 import { useAdmin } from "../../../context/AdminContext";
 import { addProduct } from "../../../lib/firestoreService";
-import Image from "next/image";
 import { playfair } from "../../../lib/font";
-import { ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -24,7 +23,7 @@ export default function AddProductPage() {
     image: "",
     rating: "0",
     stock: "",
-    sizes: "",
+    sizes: "", 
     colors: "",
     isNewArrival: false,
     isOnSale: false,
@@ -34,23 +33,15 @@ export default function AddProductPage() {
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect jika tidak login
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isAdmin) {
       router.push("/admin/login");
     }
   }, [isAdmin, isLoading, router]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,388 +56,118 @@ export default function AddProductPage() {
     setIsSubmitting(true);
 
     try {
-      // Validasi
       if (!formData.name || !formData.price || !formData.image) {
-        setError("Nama, harga, dan gambar (URL) wajib diisi");
-        setIsSubmitting(false);
-        return;
+        throw new Error("Nama, Harga, dan URL Gambar wajib diisi!");
       }
 
-      if (!adminData) {
-        setError("Data admin tidak ditemukan");
-        setIsSubmitting(false);
-        return;
-      }
+      // Bersihkan data Array
+      const sizesArray = formData.sizes.split(",").map(s => s.trim()).filter(s => s);
+      const colorsArray = formData.colors.split(",").map(c => c.trim()).filter(c => c);
 
-      // Parse sizes dan colors
-      const sizes = formData.sizes
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s);
-      const colors = formData.colors
-        .split(";")
-        .map((c) => {
-          const [name, hex] = c.split(":");
-          return name && hex ? { name: name.trim(), hex: hex.trim() } : null;
-        })
-        .filter(Boolean) as Array<{ name: string; hex: string }>;
-
-      // Buat product object
       const newProduct = {
         name: formData.name,
         price: parseFloat(formData.price),
-        originalPrice: formData.originalPrice
-          ? parseFloat(formData.originalPrice)
-          : undefined,
+        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
         discount: formData.discount || undefined,
         description: formData.description,
         category: formData.category,
-        brand: formData.brand ? formData.brand.trim() : undefined,
+        brand: formData.brand || undefined,
         image: formData.image,
         rating: parseFloat(formData.rating) || 0,
         stock: parseInt(formData.stock) || 0,
-        sizes: sizes.length > 0 ? sizes : undefined,
-        colors: colors.length > 0 ? colors : undefined,
-        adminId: adminData.id,
+        sizes: sizesArray,
+        colors: colorsArray,
+        adminId: adminData?.id || "unknown",
         isNewArrival: formData.isNewArrival,
         isOnSale: formData.isOnSale,
+        createdAt: new Date().toISOString(),
+        reviewCount: 0,
+        pcsSold: 0
       };
 
-      // Simpan ke Firestore
-      try {
-        const productId = await addProduct(newProduct);
-        console.log("Product saved to Firestore:", productId);
-      } catch (saveErr: any) {
-        console.error("❌ Saving product failed:", saveErr);
-        setError(saveErr?.message || "Gagal menyimpan produk ke database.");
-        setIsSubmitting(false);
-        return;
-      }
+      await addProduct(newProduct as any);
+      setSuccess("Produk berhasil disimpan!");
+      setTimeout(() => router.push("/admin/dashboard"), 1500);
 
-      setSuccess("Produk berhasil ditambahkan!");
-      setTimeout(() => {
-        router.push("/admin/dashboard");
-      }, 1500);
     } catch (err: any) {
-      console.error("Error adding product:", err);
-      setError(err.message || "Gagal menambahkan produk");
+      console.error("Gagal simpan:", err);
+      setError(err.message || "Terjadi kesalahan.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
+  if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
-          <button
-            onClick={() => router.push("/admin/dashboard")}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
+      <header className="bg-white shadow-sm sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
+          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full">
             <ArrowLeft size={24} className="text-gray-600" />
           </button>
-          <h1 className={`text-2xl font-bold text-blue-600 ${playfair.className}`}>
-            Tambah Produk Baru
-          </h1>
+          <h1 className={`text-xl md:text-2xl font-bold text-[#1230AE] ${playfair.className}`}>Tambah Produk Baru</h1>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        {/* Alerts */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800">{error}</p>
-          </div>
-        )}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">{error}</div>}
+        {success && <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl">{success}</div>}
 
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
-            <p className="text-green-800">{success}</p>
-          </div>
-        )}
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-xl shadow-md p-8 space-y-6"
-        >
-          {/* Basic Info Section */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-8">
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Informasi Dasar
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Product Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nama Produk *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="contoh: ONE LIFE GRAPHIC T-SHIRT"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Brand */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Brand
-                </label>
-                <input
-                  type="text"
-                  name="brand"
-                  value={formData.brand}
-                  onChange={handleInputChange}
-                  placeholder="contoh: Nike, Adidas"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Kategori *
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                >
-                  <option value="electronics">Electronics</option>
-                  <option value="clothing">Clothing</option>
-                  <option value="jewelry">Jewelry</option>
-                  <option value="shoes">Shoes</option>
-                  <option value="accessories">Accessories</option>
-                </select>
-              </div>
-
-              {/* Price */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Harga (Rp) *
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  placeholder="185000"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Original Price */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Harga Asli (Rp)
-                </label>
-                <input
-                  type="number"
-                  name="originalPrice"
-                  value={formData.originalPrice}
-                  onChange={handleInputChange}
-                  placeholder="250000"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Discount */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Diskon
-                </label>
-                <input
-                  type="text"
-                  name="discount"
-                  value={formData.discount}
-                  onChange={handleInputChange}
-                  placeholder="30% OFF"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Stock */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Stok
-                </label>
-                <input
-                  type="number"
-                  name="stock"
-                  value={formData.stock}
-                  onChange={handleInputChange}
-                  placeholder="50"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Rating (0-5)
-                </label>
-                <input
-                  type="number"
-                  name="rating"
-                  value={formData.rating}
-                  onChange={handleInputChange}
-                  placeholder="4.5"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
+            <h2 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Informasi Dasar</h2>
+            <div className="space-y-4">
+              <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Nama Produk" className="w-full p-3 border rounded-lg" />
+              <input type="text" name="brand" value={formData.brand} onChange={handleInputChange} placeholder="Brand" className="w-full p-3 border rounded-lg" />
+              <select name="category" value={formData.category} onChange={handleInputChange} className="w-full p-3 border rounded-lg bg-white">
+                <option value="electronics">Electronics</option>
+                <option value="clothing">Clothing</option>
+                <option value="jewelry">Jewelry</option>
+                <option value="shoes">Shoes</option>
+                <option value="accessories">Accessories</option>
+              </select>
+              <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Deskripsi" rows={4} className="w-full p-3 border rounded-lg" />
             </div>
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Deskripsi Produk
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Deskripsikan produk Anda secara detail..."
-              rows={5}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            />
+            <h2 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Harga & Stok</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="Harga Jual" className="w-full p-3 border rounded-lg" />
+              <input type="number" name="originalPrice" value={formData.originalPrice} onChange={handleInputChange} placeholder="Harga Coret" className="w-full p-3 border rounded-lg" />
+              <input type="text" name="discount" value={formData.discount} onChange={handleInputChange} placeholder="Diskon (30% OFF)" className="w-full p-3 border rounded-lg" />
+              <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} placeholder="Stok" className="w-full p-3 border rounded-lg" />
+            </div>
           </div>
 
-          {/* Image URL */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              URL Gambar Produk *
-            </label>
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleInputChange}
-              placeholder="https://example.com/product.jpg"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-            {formData.image && (
-              <div className="mt-3 relative w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
-                <img src={formData.image} alt="Preview" className="object-cover w-full h-full" />
+            <h2 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Media & Varian</h2>
+            <input type="url" name="image" value={formData.image} onChange={handleInputChange} placeholder="URL Gambar" className="w-full p-3 border rounded-lg mb-4" />
+            {formData.image && <img src={formData.image} alt="Preview" className="w-32 h-32 object-cover rounded-lg border mb-4" />}
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Ukuran (Pisahkan koma)</label>
+                <input type="text" name="sizes" value={formData.sizes} onChange={handleInputChange} placeholder="S, M, L" className="w-full p-3 border rounded-lg" />
               </div>
-            )}
-          </div>
-
-          {/* Variants */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Sizes */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Ukuran (pisahkan dengan koma)
-              </label>
-              <input
-                type="text"
-                name="sizes"
-                value={formData.sizes}
-                onChange={handleInputChange}
-                placeholder="S, M, L, XL"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Contoh: S, M, L, XL, XXL
-              </p>
-            </div>
-
-            {/* Colors */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Warna (nama:hex, pisahkan dengan ;)
-              </label>
-              <input
-                type="text"
-                name="colors"
-                value={formData.colors}
-                onChange={handleInputChange}
-                placeholder="Red:#FF0000; Blue:#0000FF"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Contoh: Red:#FF0000; Blue:#0000FF; Green:#00FF00
-              </p>
+              <div>
+                <label className="text-sm font-medium">Warna (Pisahkan koma)</label>
+                <input type="text" name="colors" value={formData.colors} onChange={handleInputChange} placeholder="Merah, Biru" className="w-full p-3 border rounded-lg" />
+              </div>
             </div>
           </div>
 
-          {/* Flags: New Arrival, On Sale */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="isNewArrival"
-                name="isNewArrival"
-                checked={!!formData.isNewArrival}
-                onChange={handleCheckboxChange}
-                className="w-4 h-4"
-              />
-              <label htmlFor="isNewArrival" className="text-sm font-medium">
-                Tandai sebagai New Arrival (tampil di halaman New Arrivals)
-              </label>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="isOnSale"
-                name="isOnSale"
-                checked={!!formData.isOnSale}
-                onChange={handleCheckboxChange}
-                className="w-4 h-4"
-              />
-              <label htmlFor="isOnSale" className="text-sm font-medium">
-                Tandai sebagai On Sale (tampil di halaman On Sale)
-              </label>
-            </div>
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2"><input type="checkbox" name="isNewArrival" checked={formData.isNewArrival} onChange={handleCheckboxChange} /> New Arrival</label>
+            <label className="flex items-center gap-2"><input type="checkbox" name="isOnSale" checked={formData.isOnSale} onChange={handleCheckboxChange} /> On Sale</label>
           </div>
 
-          {/* Submit Buttons */}
-          <div className="flex gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => router.push("/admin/dashboard")}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? "Sedang menyimpan..." : "Simpan Produk"}
+          <div className="flex gap-4 pt-4 border-t">
+            <button type="button" onClick={() => router.back()} className="flex-1 py-3 border rounded-lg">Batal</button>
+            <button type="submit" disabled={isSubmitting} className="flex-1 py-3 bg-[#1230AE] text-white rounded-lg disabled:opacity-50">
+              {isSubmitting ? "Menyimpan..." : "Simpan Produk"}
             </button>
           </div>
         </form>

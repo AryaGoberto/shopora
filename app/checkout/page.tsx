@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
-import { ChevronLeft, MapPin, Bell, Building2, Smartphone, CheckCircle2, Truck, CreditCard, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, MapPin, Bell, Building2, Smartphone, CheckCircle2, Truck, CreditCard, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { collection, addDoc } from 'firebase/firestore';
+
+// Import Logic & Database
+import { useCart } from '../context/CartContext'; // Pastikan path benar
+import { db } from '../lib/firebase';
 
 // --- DATA DUMMY DELIVERY ---
 const deliveryOptionsData = [
@@ -12,6 +18,11 @@ const deliveryOptionsData = [
 ];
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  
+  // 1. AMBIL DATA KERANJANG ASLI
+  const { cart, totalPrice } = useCart(); 
+
   // STATE: ALAMAT
   const [address, setAddress] = useState({
     label: "Home",
@@ -22,11 +33,11 @@ export default function CheckoutPage() {
 
   // STATE: PILIHAN USER
   const [selectedDelivery, setSelectedDelivery] = useState(deliveryOptionsData[0]); 
-  const [selectedPayment, setSelectedPayment] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // STATE: HARGA
-  const subTotal = 789000;
-  const discount = 30000;
+  // 2. HITUNG HARGA DINAMIS (Bukan Hardcode lagi)
+  const subTotal = totalPrice; // Ambil dari CartContext
+  const discount = subTotal > 0 ? subTotal * 0.1 : 0; // Contoh diskon 10%
   const total = subTotal + selectedDelivery.price - discount;
 
   // HANDLE SIMPAN ALAMAT
@@ -35,13 +46,53 @@ export default function CheckoutPage() {
     setIsAddressModalOpen(false);
   };
 
-  // HANDLE FINISH (KOSONGKAN UNTUK TEMAN ANDA)
-  const handleFinishOrder = () => {
-    // Area ini sengaja dikosongkan.
-    // Teman Anda nanti akan mengisi logika Payment Gateway di sini.
-    // Saat ini tombol tidak akan memunculkan alert apapun.
-    console.log("Menunggu integrasi Backend...");
+  // 3. HANDLE FINISH ORDER (LOGIKA MIDTRANS)
+  const handleFinishOrder = async () => {
+    if (cart.length === 0) {
+      alert("Keranjang kosong!");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Siapkan data order
+      const orderData = {
+        items: cart,
+        customer: {
+          name: "Guest User", // Nanti bisa ambil dari Auth
+          address: address.detail,
+          phone: "08123456789" // Nanti bisa ambil dari inputan
+        },
+        delivery: selectedDelivery,
+        subtotal: subTotal,
+        discount: discount,
+        deliveryFee: selectedDelivery.price,
+        totalAmount: total, // PENTING: Ini yang dibayar
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      // Simpan ke Firebase
+      const docRef = await addDoc(collection(db, "orders"), orderData);
+      
+      // Redirect ke Halaman Payment (yang ada Midtrans-nya)
+      router.push(`/payment?orderId=${docRef.id}`);
+
+    } catch (error) {
+      console.error("Gagal checkout:", error);
+      alert("Terjadi kesalahan sistem.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Kalau keranjang kosong, redirect balik (Opsional)
+  useEffect(() => {
+    if (cart.length === 0) {
+      // router.push('/'); // Uncomment kalau mau maksa balik
+    }
+  }, [cart, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-10 relative">
@@ -50,7 +101,7 @@ export default function CheckoutPage() {
       <header className="bg-white sticky top-0 z-30 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-2">
           <Link
-            href="/"
+            href="/cart"
             className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"
           >
             <ChevronLeft className="w-6 h-6 text-gray-800" />
@@ -127,43 +178,12 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* 3. PAYMENT METHOD PREFERENCE */}
-            <section className="space-y-4">
-              <h2 className="font-bold text-gray-800 text-sm lg:text-base">Payment Method Preference</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* BCA */}
-                <div 
-                  onClick={() => setSelectedPayment('BCA Virtual Account')}
-                  className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden group
-                    ${selectedPayment === 'BCA Virtual Account' ? 'border-blue-600 bg-blue-50 shadow-md' : 'border-gray-100 bg-white hover:border-blue-200'}`}
-                >
-                  <div className="mb-3 bg-blue-100 w-10 h-10 rounded-lg flex items-center justify-center text-blue-600"><Building2 className="w-5 h-5" /></div>
-                  <p className="font-bold text-gray-800 text-sm">BCA VA</p>
-                  {selectedPayment === 'BCA Virtual Account' && <div className="absolute top-2 right-2 text-blue-600"><CheckCircle2 className="w-5 h-5" /></div>}
-                </div>
-
-                {/* GoPay */}
-                <div 
-                  onClick={() => setSelectedPayment('GoPay')}
-                  className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden group
-                    ${selectedPayment === 'GoPay' ? 'border-green-600 bg-green-50 shadow-md' : 'border-gray-100 bg-white hover:border-green-200'}`}
-                >
-                  <div className="mb-3 bg-green-100 w-10 h-10 rounded-lg flex items-center justify-center text-green-600"><Smartphone className="w-5 h-5" /></div>
-                  <p className="font-bold text-gray-800 text-sm">GoPay</p>
-                  {selectedPayment === 'GoPay' && <div className="absolute top-2 right-2 text-green-600"><CheckCircle2 className="w-5 h-5" /></div>}
-                </div>
-
-                {/* Credit Card */}
-                <div 
-                  onClick={() => setSelectedPayment('Credit Card')}
-                  className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden group
-                    ${selectedPayment === 'Credit Card' ? 'border-purple-600 bg-purple-50 shadow-md' : 'border-gray-100 bg-white hover:border-purple-200'}`}
-                >
-                  <div className="mb-3 bg-purple-100 w-10 h-10 rounded-lg flex items-center justify-center text-purple-600"><CreditCard className="w-5 h-5" /></div>
-                  <p className="font-bold text-gray-800 text-sm">Credit Card</p>
-                  {selectedPayment === 'Credit Card' && <div className="absolute top-2 right-2 text-purple-600"><CheckCircle2 className="w-5 h-5" /></div>}
-                </div>
-              </div>
+            {/* 3. PAYMENT METHOD DIHAPUS (Karena akan pilih di Midtrans) */}
+            <section className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex gap-3 items-center">
+               <CreditCard className="text-blue-600 w-5 h-5" />
+               <p className="text-sm text-blue-800 font-medium">
+                 Metode pembayaran akan dipilih di langkah selanjutnya (via Midtrans).
+               </p>
             </section>
 
           </div>
@@ -177,15 +197,15 @@ export default function CheckoutPage() {
 
               <div className="space-y-3 text-sm lg:text-base">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Sub-total</span>
+                  <span className="text-gray-500">Sub-total ({cart.length} items)</span>
                   <span className="font-bold text-gray-900">Rp{subTotal.toLocaleString('id-ID')}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Delivery Fee ({selectedDelivery.name})</span>
+                  <span className="text-gray-500">Delivery Fee</span>
                   <span className="font-bold text-gray-900">Rp{selectedDelivery.price.toLocaleString('id-ID')}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Discount</span>
+                  <span className="text-gray-500">Discount (10%)</span>
                   <span className="font-bold text-red-500">-Rp{discount.toLocaleString('id-ID')}</span>
                 </div>
               </div>
@@ -197,29 +217,32 @@ export default function CheckoutPage() {
                 <span className="font-bold text-lg lg:text-2xl text-gray-900">Rp{total.toLocaleString('id-ID')}</span>
               </div>
 
-              {/* TOMBOL YANG SUDAH DIMATIKAN POP-UP NYA */}
+              {/* TOMBOL FINISH ORDER */}
               <button 
                 onClick={handleFinishOrder}
-                // Tombol akan disable (tidak bisa klik) jika belum pilih metode pembayaran
-                disabled={!selectedPayment}
-                className={`w-full py-3.5 lg:py-4 rounded-xl font-bold text-sm lg:text-base shadow-lg transition-all active:scale-[0.98]
-                  ${selectedPayment 
-                    ? 'bg-blue-700 text-white hover:bg-blue-800 shadow-blue-200' // Style Aktif
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none' // Style Mati (Disabled)
+                disabled={loading || cart.length === 0}
+                className={`w-full py-3.5 lg:py-4 rounded-xl font-bold text-sm lg:text-base shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2
+                  ${loading || cart.length === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                    : 'bg-blue-700 text-white hover:bg-blue-800 shadow-blue-200'
                   }`}
               >
-                Finish Order & Pay
+                {loading ? (
+                  <> <Loader2 className="animate-spin" /> Processing... </>
+                ) : (
+                  "Finish Order & Pay"
+                )}
               </button>
 
               <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
-                By clicking finish, you agree to our terms.
+                By clicking finish, you agree to our terms. Secure payment by Midtrans.
               </p>
             </div>
           </div>
         </div>
       </main>
 
-      {/* --- MODAL EDIT ALAMAT --- */}
+      {/* --- MODAL EDIT ALAMAT (TETAP SAMA) --- */}
       {isAddressModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
           <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in duration-200">
