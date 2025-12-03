@@ -186,15 +186,16 @@ export default function ProductDetailPage() {
             <h1 className="text-4xl font-black text-gray-900 mb-3 uppercase">{product.name}</h1>
 
             <div className="flex items-center space-x-4 mb-4">
-              <span className="text-4xl font-bold text-[#1230AE]">
+              <span className="text-3xl font-bold text-[#1230AE]">
                 Rp{product.price.toLocaleString("id-ID")}
               </span>
+
               {product.originalPrice && (
                 <>
-                  <span className="text-xl text-gray-400 line-through">
+                  <span className="text-lg text-gray-400 line-through">
                     Rp{product.originalPrice.toLocaleString("id-ID")}
                   </span>
-                  <span className="bg-red-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                     {product.discount}
                   </span>
                 </>

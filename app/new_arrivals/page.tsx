@@ -12,7 +12,7 @@ export default async function NewArrivalsPage() {
     <div className="min-h-screen bg-white font-sans">
       <TopBanner />
       <Header />
-      <NewArrivalsBanner />
+      <NewArrivalsBanner imageUrl="/new_arrival.png" />
       <ProductSection
         title="New Arrivals"
         products={products.filter((p) => p.isNewArrival)}
