@@ -10,6 +10,10 @@ const snap = new Midtrans.Snap({
 
 export async function POST(request: Request) {
   try {
+    // Debug: Cek apakah keys terbaca
+    console.log("Server Key exists:", !!process.env.MIDTRANS_SERVER_KEY);
+    console.log("Server Key prefix:", process.env.MIDTRANS_SERVER_KEY?.substring(0, 15));
+
     // 1. Ambil data dari frontend
     const { orderId, totalAmount, items } = await request.json();
 

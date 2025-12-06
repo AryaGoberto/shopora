@@ -7,13 +7,13 @@ import { CartItem as CartItemType } from "../../context/CartContext";
 
 interface CartItemProps {
   item: CartItemType;
-  
-  // Definisi fungsi tetap meminta number (sesuai Context)
-  onIncrease?: (id: number) => void; 
-  onDecrease?: (id: number) => void;
-  onRemove?: (id: number) => void;
-  onUpdateQuantity?: (id: number, qty: number) => void;
-  
+
+  // Definisi fungsi menerima string | number (sesuai Context)
+  onIncrease?: (id: string | number) => void;
+  onDecrease?: (id: string | number) => void;
+  onRemove?: (id: string | number) => void;
+  onUpdateQuantity?: (id: string | number, qty: number) => void;
+
   readOnly?: boolean;
 }
 
@@ -26,8 +26,8 @@ export default function CartItem({
   readOnly = false
 }: CartItemProps) {
 
-  // --- PERBAIKAN DI SINI: Konversi ID ke Number ---
-  const productId = Number(item.id); 
+  // Gunakan ID langsung tanpa konversi
+  const productId = item.id; 
 
   const handleIncrease = () => {
     if (onUpdateQuantity) {
@@ -38,10 +38,12 @@ export default function CartItem({
   };
 
   const handleDecrease = () => {
-    if (onUpdateQuantity) {
-      onUpdateQuantity(productId, item.quantity - 1);
-    } else if (onDecrease) {
-      onDecrease(productId);
+    if (item.quantity > 1) {
+      if (onUpdateQuantity) {
+        onUpdateQuantity(productId, item.quantity - 1);
+      } else if (onDecrease) {
+        onDecrease(productId);
+      }
     }
   };
 
@@ -104,20 +106,24 @@ export default function CartItem({
           ) : (
             <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
               <button
+                type="button"
                 onClick={handleDecrease}
                 disabled={item.quantity <= 1}
-                className={`text-xl font-bold cursor-pointer ${
-                  item.quantity <= 1 ? "text-gray-300" : "hover:text-gray-600"
+                className={`p-1 transition-all ${
+                  item.quantity <= 1
+                    ? "text-gray-300 cursor-not-allowed"
+                    : "text-gray-700 hover:text-black hover:bg-gray-200 rounded-full cursor-pointer"
                 }`}
               >
                 <Minus size={16} />
               </button>
 
-              <span className="font-medium w-4 text-center">{item.quantity}</span>
+              <span className="font-medium w-8 text-center">{item.quantity}</span>
 
               <button
+                type="button"
                 onClick={handleIncrease}
-                className="text-xl font-bold cursor-pointer hover:text-gray-600"
+                className="p-1 text-gray-700 hover:text-black hover:bg-gray-200 rounded-full cursor-pointer transition-all"
               >
                 <Plus size={16} />
               </button>

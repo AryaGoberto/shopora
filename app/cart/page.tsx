@@ -6,6 +6,7 @@ import { ArrowLeft, ShoppingBag } from "lucide-react";
 
 // --- PENTING: IMPORT DARI CONTEXT ---
 import { useCart } from "../context/CartContext";
+import { calculateOrderTotal } from "../lib/config";
 
 // Import Komponen UI (Pastikan path benar)
 import CartItem from "../components/checkout/CartItem";
@@ -16,14 +17,10 @@ import Newsletter from "../components/common/NewsLetter";
 
 export default function CartPage() {
   // 1. PANGGIL DATA & FUNGSI DARI CONTEXT
-  // Tidak perlu lagi pakai useState manual atau useEffect ribet
   const { cart, updateQuantity, removeFromCart, totalPrice } = useCart();
 
-  // 2. HITUNG BIAYA (Logika disamakan dengan Checkout)
-  const subtotal = totalPrice;
-  const discount = subtotal > 0 ? subtotal * 0.2 : 0; // Diskon 20%
-  const deliveryFee = subtotal > 0 ? 15 : 0;
-  const total = subtotal - discount + deliveryFee;
+  // 2. HITUNG BIAYA menggunakan konfigurasi
+  const { subtotal, discount, deliveryFee, total, isFreeShipping } = calculateOrderTotal(totalPrice);
 
   return (
     <>
@@ -86,6 +83,7 @@ export default function CartPage() {
               discount={discount}
               deliveryFee={deliveryFee}
               total={total}
+              isFreeShipping={isFreeShipping}
             />
           </div>
         )}

@@ -1,25 +1,27 @@
-"use client"; // 1. Wajib ada agar tombol bisa diklik
+"use client";
 
 import React from 'react';
 import { Tag, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // 2. Import Router
+import { useRouter } from 'next/navigation';
+import { formatIDR } from '../../lib/format';
 
-// Definisikan tipe data
 interface OrderSummaryProps {
   subtotal: number;
   discount: number;
   deliveryFee: number;
   total: number;
+  isFreeShipping?: boolean;
 }
 
-export default function OrderSummary({ 
-  subtotal, 
-  discount, 
-  deliveryFee, 
-  total 
+export default function OrderSummary({
+  subtotal,
+  discount,
+  deliveryFee,
+  total,
+  isFreeShipping = false
 }: OrderSummaryProps) {
-  
-  const router = useRouter(); // 3. Inisialisasi Router
+
+  const router = useRouter();
 
   return (
     <div className="w-full lg:w-1/3 h-fit border rounded-2xl p-6">
@@ -28,19 +30,30 @@ export default function OrderSummary({
       <div className="space-y-4 mb-6">
         <div className="flex justify-between text-gray-600 text-lg">
           <span>Subtotal</span>
-          <span className="font-bold text-black">${subtotal.toLocaleString()}</span>
+          <span className="font-bold text-black">{formatIDR(subtotal)}</span>
         </div>
         <div className="flex justify-between text-gray-600 text-lg">
           <span>Discount (-20%)</span>
-          <span className="font-bold text-red-500">-${discount.toLocaleString()}</span>
+          <span className="font-bold text-red-500">-{formatIDR(discount)}</span>
         </div>
         <div className="flex justify-between text-gray-600 text-lg">
           <span>Delivery Fee</span>
-          <span className="font-bold text-black">${deliveryFee}</span>
+          <div className="flex items-center gap-2">
+            {isFreeShipping && deliveryFee === 0 ? (
+              <>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                  FREE
+                </span>
+                <span className="font-bold text-gray-400 line-through text-sm">{formatIDR(25000)}</span>
+              </>
+            ) : (
+              <span className="font-bold text-black">{formatIDR(deliveryFee)}</span>
+            )}
+          </div>
         </div>
         <div className="border-t pt-4 flex justify-between text-xl font-bold">
           <span>Total</span>
-          <span>${total.toLocaleString()}</span>
+          <span>{formatIDR(total)}</span>
         </div>
       </div>
 
