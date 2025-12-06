@@ -4,7 +4,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../context/AdminContext";
-import { getProductsByAdminId, deleteProduct } from "../../lib/firestoreService";
+import {
+  getProductsByAdminId,
+  deleteProduct,
+} from "../../lib/firestoreService";
 import { Product } from "../../lib/types";
 import Image from "next/image";
 import { playfair } from "../../lib/font";
@@ -110,7 +113,9 @@ export default function AdminDashboardPage() {
               height={30}
             />
             <div>
-              <h1 className={`text-2xl font-bold text-blue-600 ${playfair.className}`}>
+              <h1
+                className={`text-2xl font-bold text-blue-600 ${playfair.className}`}
+              >
                 Shopora Admin
               </h1>
               <p className="text-sm text-gray-600">{adminData?.storeName}</p>
@@ -149,7 +154,8 @@ export default function AdminDashboardPage() {
           <div>
             <h2 className="text-3xl font-bold text-gray-900">Produk Saya</h2>
             <p className="text-gray-600 mt-1">
-              Total: <span className="font-semibold">{products.length} produk</span>
+              Total:{" "}
+              <span className="font-semibold">{products.length} produk</span>
             </p>
           </div>
 
@@ -171,7 +177,9 @@ export default function AdminDashboardPage() {
         ) : products.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
             <div className="text-5xl mb-4">📦</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Belum ada produk</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              Belum ada produk
+            </h3>
             <p className="text-gray-600 mb-6">
               Mulai tambahkan produk untuk ditampilkan di toko Anda
             </p>
@@ -191,13 +199,13 @@ export default function AdminDashboardPage() {
                 className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"
               >
                 {/* Product Image */}
-                <div className="relative w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="relative w-full aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
                   <Image
                     src={product.image}
                     alt={product.name}
-                    width={200}
-                    height={160}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 300px"
                   />
                   {product.discount && (
                     <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -229,14 +237,17 @@ export default function AdminDashboardPage() {
 
                   {/* Stock */}
                   <p className="text-sm text-gray-700 mb-4">
-                    Stok: <span className="font-semibold">{product.stock || 0}</span>
+                    Stok:{" "}
+                    <span className="font-semibold">{product.stock || 0}</span>
                   </p>
 
                   {/* Actions */}
                   <div className="flex gap-2">
                     <button
                       onClick={() =>
-                        router.push(`/admin/dashboard/edit-product/${product.id}`)
+                        router.push(
+                          `/admin/dashboard/edit-product/${product.id}`
+                        )
                       }
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium text-sm"
                     >
@@ -249,7 +260,9 @@ export default function AdminDashboardPage() {
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium text-sm disabled:opacity-50"
                     >
                       <Trash2 size={16} />
-                      {deletingId === String(product.id) ? "Deleting..." : "Hapus"}
+                      {deletingId === String(product.id)
+                        ? "Deleting..."
+                        : "Hapus"}
                     </button>
                   </div>
                 </div>
