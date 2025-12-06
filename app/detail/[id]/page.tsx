@@ -17,9 +17,11 @@ import {
   Loader2,
 } from "lucide-react";
 import Newsletter from "../../components/common/NewsLetter";
+import ReviewList from "../../components/product/ReviewList";
 import { getProductById } from "../../lib/firestoreService";
 import { Product } from "../../lib/types";
 import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 import Header from "@/app/components/common/Header";
 
 // --- Helper Stars ---
@@ -52,6 +54,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +65,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState("");
   const [isAdded, setIsAdded] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -92,6 +96,7 @@ export default function ProductDetailPage() {
           
           setProduct(cleanProduct);
           setMainImage(cleanProduct.image);
+          setIsWishlisted(isInWishlist(productId));
           
           // Set defaults
           if (safeColors.length > 0) setSelectedColor(safeColors[0]);
@@ -284,11 +289,35 @@ export default function ProductDetailPage() {
                 )}
               </button>
 
-              <button className="p-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-500">
-                <Heart size={24} />
+              <button 
+                onClick={() => {
+                  if (product) {
+                    if (isWishlisted) {
+                      removeFromWishlist(product.id);
+                    } else {
+                      addToWishlist(product);
+                    }
+                    setIsWishlisted(!isWishlisted);
+                  }
+                }}
+                className={`p-3 border rounded-full transition-all ${
+                  isWishlisted 
+                    ? "bg-red-100 border-red-300 text-red-500" 
+                    : "border-gray-300 hover:bg-gray-100 text-gray-500 hover:text-red-500"
+                }`}
+              >
+                <Heart size={24} fill={isWishlisted ? "currentColor" : "none"} />
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="border-t pt-12">
+          <h2 className="text-3xl font-black text-gray-900 mb-8">Customer Reviews</h2>
+          <ReviewList productId={params.id as string} productName={product.name} />
         </div>
       </div>
       

@@ -1,152 +1,147 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChevronLeft, Bell } from 'lucide-react';
-import Link from 'next/link'; // <--- Wajib di-import
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, Bell, Package } from 'lucide-react';
+import Link from 'next/link';
+import { getAllOrders, updateOrderStatus, getOrderReviews } from '../lib/firestoreService';
+import OrderCard from '../components/order/OrderCard';
 
-// --- TYPE DEFINITION ---
-type OrderItem = {
-  id: number;
-  name: string;
-  size: string;
-  price: string;
-  color: string;
-  estDate?: string;     
-  status?: string;      
-  statusColor?: string; 
-  isReviewed?: boolean; 
+type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'received';
+
+type Order = {
+  id: string;
+  items: any[];
+  totalPrice: number;
+  subtotal: number;
+  discount: number;
+  deliveryFee: number;
+  invoiceNumber: string;
+  status: OrderStatus;
+  createdAt: any;
+  estimatedDelivery?: string;
 };
 
-// --- 1. DATA MOCKUP: ONGOING ---
-const ongoingOrders: OrderItem[] = [
-  {
-    id: 1,
-    name: "Pedro Leather Shoes",
-    size: "38",
-    price: "Rp1.500.000",
-    estDate: "September 15 - 17, 2025",
-    color: "bg-orange-100",
-    status: "Track Order",
-    statusColor: "text-blue-600"
-  },
-  {
-    id: 2,
-    name: "Red Blazer",
-    size: "L",
-    price: "Rp750.000",
-    estDate: "September 15 - 17, 2025",
-    color: "bg-red-100",
-    status: "Track Order",
-    statusColor: "text-blue-600"
-  },
-];
-
-// --- 2. DATA MOCKUP: COMPLETED ---
-const completedOrders: OrderItem[] = [
-  {
-    id: 101,
-    name: "Pedro Leather Shoes",
-    size: "38",
-    price: "Rp1.500.000",
-    color: "bg-orange-100",
-    status: "Delivered",
-    statusColor: "text-emerald-500"
-  },
-  {
-    id: 102,
-    name: "Red Blazer",
-    size: "L",
-    price: "Rp750.000",
-    color: "bg-red-100",
-    status: "Delivered",
-    statusColor: "text-emerald-500"
-  },
-];
-
-// --- 3. DATA MOCKUP: REVIEW ---
-const reviewOrders: OrderItem[] = [
-  {
-    id: 201,
-    name: "Pedro Leather Shoes",
-    size: "38",
-    price: "Rp1.500.000",
-    color: "bg-orange-100",
-    isReviewed: false 
-  },
-  {
-    id: 202,
-    name: "Red Blazer",
-    size: "L",
-    price: "Rp750.000",
-    color: "bg-red-100",
-    isReviewed: false 
-  },
-  {
-    id: 203,
-    name: "women Sunglass",
-    size: "S",
-    price: "Rp120.000",
-    color: "bg-teal-100",
-    isReviewed: true 
-  },
-  {
-    id: 204,
-    name: "Blue Diamond Guess",
-    size: "S",
-    price: "Rp12.000.000",
-    color: "bg-gray-200",
-    isReviewed: true 
-  },
-];
-
 export default function MyOrdersPage() {
-  const [activeTab, setActiveTab] = useState('Ongoing'); // Default ke Ongoing agar langsung terlihat
+  const [activeTab, setActiveTab] = useState('Ongoing');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersWithReviews, setOrdersWithReviews] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null);
 
-  // Selector Data
+  // Load orders from Firestore
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setIsLoading(true);
+        console.log('📥 Fetching all orders from Firestore...');
+        
+        const allOrders = await getAllOrders();
+        console.log('📦 Raw orders from Firestore:', allOrders);
+        
+        if (!allOrders || allOrders.length === 0) {
+          console.warn('⚠️ No orders found in Firestore');
+          setOrders([]);
+          return;
+        }
+        
+        // Log first order structure
+        if (allOrders.length > 0) {
+          console.log('🔍 First order structure:', allOrders[0]);
+          console.log('🔍 First order status:', allOrders[0].status);
+          console.log('🔍 Order statuses in response:', allOrders.map(o => ({ id: o.id, status: o.status })));
+        }
+        
+        // Sort by createdAt descending (newest first)
+        const sortedOrders = allOrders.sort((a, b) => {
+          const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt);
+          const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+        
+        console.log('✅ Orders loaded and sorted:', sortedOrders.length, 'orders');
+        console.log('Status breakdown:', {
+          confirmed: sortedOrders.filter(o => o.status === 'confirmed').length,
+          processing: sortedOrders.filter(o => o.status === 'processing').length,
+          shipped: sortedOrders.filter(o => o.status === 'shipped').length,
+          delivered: sortedOrders.filter(o => o.status === 'delivered').length,
+          received: sortedOrders.filter(o => o.status === 'received').length,
+          other: sortedOrders.filter(o => !['confirmed', 'processing', 'shipped', 'delivered', 'received'].includes(o.status)).length,
+        });
+        setOrders(sortedOrders);
+
+        // Check which orders have reviews
+        const reviewedSet = new Set<string>();
+        for (const order of sortedOrders) {
+          const reviews = await getOrderReviews(order.id);
+          if (reviews && reviews.length > 0) {
+            reviewedSet.add(order.id);
+            console.log(`✅ Order ${order.id} has ${reviews.length} review(s)`);
+          }
+        }
+        setOrdersWithReviews(reviewedSet);
+        console.log(`📊 Total orders with reviews: ${reviewedSet.size}`);
+        
+      } catch (error) {
+        console.error('❌ Error loading orders:', error);
+        setOrders([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadOrders();
+    
+    // Note: Removed auto-refresh interval to prevent constant re-renders
+    // Orders will only load when page is opened
+    
+  }, []);
+
+  // Filter orders by status
   const getDisplayData = () => {
-    switch (activeTab) {
-      case 'Ongoing': return ongoingOrders;
-      case 'Complete': return completedOrders;
-      case 'Review': return reviewOrders;
-      default: return [];
+    console.log(`🔍 Filtering for tab: ${activeTab}`);
+    console.log(`📊 Total orders available: ${orders.length}`);
+    
+    if (activeTab === 'Ongoing') {
+      const ongoing = orders.filter(o => {
+        const hasStatus = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'].includes(o.status);
+        if (!hasStatus) {
+          console.warn(`⚠️ Order ${o.id} has status: "${o.status}" (not in ongoing list)`);
+        }
+        return hasStatus;
+      });
+      console.log(`✅ Ongoing orders: ${ongoing.length}`);
+      return ongoing;
     }
+    if (activeTab === 'Complete') {
+      const complete = orders.filter(o => o.status === 'received');
+      console.log(`✅ Complete orders: ${complete.length}`);
+      return complete;
+    }
+    // Review tab - only show orders that have reviews
+    const reviewed = orders.filter(o => ordersWithReviews.has(o.id));
+    console.log(`✅ Reviewed orders: ${reviewed.length} out of ${orders.length}`);
+    return reviewed;
   };
 
   const displayData = getDisplayData();
 
-  // --- LOGIKA TOMBOL ACTION (PERBAIKAN DI SINI) ---
-  const renderAction = (item: OrderItem) => {
-    // 1. Logika Tab ONGOING (Gunakan Link ke /track-order)
-    if (activeTab === 'Ongoing') {
-      return (
-        <Link 
-          href="/trackorder" 
-          className="text-blue-600 font-bold text-xs sm:text-sm hover:underline cursor-pointer z-10"
-        >
-          Track Order
-        </Link>
-      );
+  // Handle "Pesanan Diterima" button
+  const handleOrderReceived = async (orderId: string) => {
+    try {
+      setIsUpdatingStatus(orderId);
+      await updateOrderStatus(orderId, 'received');
+      
+      // Update local state
+      setOrders(orders.map(o => 
+        o.id === orderId ? { ...o, status: 'received' } : o
+      ));
+      
+      console.log('✅ Order marked as received:', orderId);
+    } catch (error) {
+      console.error('❌ Error updating order:', error);
+    } finally {
+      setIsUpdatingStatus(null);
     }
-
-    // 2. Logika Tab REVIEW
-    if (activeTab === 'Review') {
-      if (item.isReviewed) {
-        return <span className="text-gray-500 font-medium text-xs sm:text-sm">See Review</span>;
-      } else {
-        return (
-          <button className="bg-indigo-100 text-indigo-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-200 transition">
-            Review
-          </button>
-        );
-      }
-    }
-
-    // 3. Logika Tab COMPLETE (Teks Status Biasa)
-    return (
-      <span className={`${item.statusColor} font-bold text-xs sm:text-sm`}>
-        {item.status}
-      </span>
-    );
   };
 
   return (
@@ -185,64 +180,35 @@ export default function MyOrdersPage() {
           ))}
         </div>
 
-        {/* ORDER LIST GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {displayData.map((item) => (
-            <div 
-              key={item.id} 
-              className="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow flex gap-4 items-start relative group"
-            >
-              {/* Image Placeholder */}
-              <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl shrink-0 ${item.color} relative overflow-hidden`}>
-                {/* <Image src="..." /> */}
-              </div>
-
-              {/* Content Area */}
-              <div className="flex-1 flex flex-col h-full min-h-[6rem] justify-center relative">
-                
-                {/* Header: Nama & Action (Desktop) */}
-                <div className="flex justify-between items-start mb-1">
-                  <div className="pr-2">
-                    <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-2 leading-tight mb-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-gray-500 text-xs">Size : {item.size}</p>
-                  </div>
-                  
-                  {/* Action Button (Desktop: Top Right) */}
-                  <div className="hidden sm:block shrink-0">
-                    {renderAction(item)}
-                  </div>
-                </div>
-
-                {/* Footer: Harga & Action (Mobile) */}
-                <div className="mt-2 sm:mt-auto">
-                   <div className="flex justify-between items-end">
-                      <p className="font-bold text-gray-900 text-sm sm:text-lg">{item.price}</p>
-                      
-                      {/* Action Button (Mobile: Bottom Right aligns with Price) */}
-                      <div className="sm:hidden mb-0.5">
-                        {renderAction(item)}
-                      </div>
-                   </div>
-                   
-                   {/* Estimasi Tanggal (Hanya Ongoing) */}
-                   {item.estDate && (
-                     <p className="text-[10px] sm:text-xs text-gray-400 mt-1">
-                       Estimated delivery : {item.estDate}
-                     </p>
-                   )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {displayData.length === 0 && (
-           <div className="text-center py-20 text-gray-400">
-              <p>No orders found in {activeTab}</p>
-           </div>
+        {/* LOADING STATE */}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading orders...</p>
+          </div>
+        ) : displayData.length === 0 ? (
+          /* EMPTY STATE */
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+            <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-gray-800 mb-2">No orders yet</h3>
+            <p className="text-gray-600 mb-6">You haven't placed any orders in {activeTab}</p>
+            <Link href="/" className="text-blue-600 font-bold hover:underline">
+              Start shopping now
+            </Link>
+          </div>
+        ) : (
+          /* ORDER LIST GRID */
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {displayData.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                activeTab={activeTab}
+                isUpdatingStatus={isUpdatingStatus}
+                onOrderReceived={handleOrderReceived}
+              />
+            ))}
+          </div>
         )}
 
       </main>

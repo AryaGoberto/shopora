@@ -3,7 +3,8 @@ import "./globals.css";
 import { inter as Inter } from "./lib/font";
 
 import { AdminProvider } from "./context/AdminContext";
-import { CartProvider } from "./context/CartContext"; // 
+import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 import ChatBot from "./components/utils/chatbot";
 
@@ -18,13 +19,13 @@ export default function RootLayout({
         
         {/* BUNGKUS APLIKASI DENGAN PROVIDER */}
         <AdminProvider>
-          <CartProvider> {/* <--- PASANG DI SINI */}
-            
-            {children}
-            
-            <ChatBot />
-            
-          </CartProvider> {/* <--- TUTUP DI SINI */}
+          <CartProvider>
+            <WishlistProvider>
+              {children}
+              
+              <ChatBot />
+            </WishlistProvider>
+          </CartProvider>
         </AdminProvider>
         
       </body>
