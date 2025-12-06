@@ -82,10 +82,10 @@ export default function ProductDetailPage() {
           if (Array.isArray(data.colors)) {
             safeColors = data.colors.map((c: unknown) => {
               if (typeof c === "object" && c !== null && "name" in c) {
-                return c.name; // Extract name if object
+                return (c as any).name; // Extract name if object
               }
               return String(c); // Otherwise force to string
-            });
+            }) as string[];
           }
 
           const safeSizes = Array.isArray(data.sizes) ? data.sizes : [];
@@ -99,7 +99,8 @@ export default function ProductDetailPage() {
 
           setProduct(cleanProduct);
           setMainImage(cleanProduct.image);
-
+          setIsWishlisted(isInWishlist(productId));
+          
           // Set defaults
           if (safeColors.length > 0) setSelectedColor(safeColors[0]);
           if (safeSizes.length > 0) setSelectedSize(safeSizes[0]);
@@ -349,6 +350,14 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
+      {/* Reviews Section */}
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="border-t pt-12">
+          <h2 className="text-3xl font-black text-gray-900 mb-8">Customer Reviews</h2>
+          <ReviewList productId={params.id as string} productName={product.name} />
+        </div>
+      </div>
+      
       <Newsletter />
       <Footer />
     </div>

@@ -322,12 +322,13 @@ export async function saveOrder(order: any): Promise<string> {
 }
 
 /**
- * Get all orders (bisa di-filter by userId nanti)
+ * Get all orders for a specific user
  */
-export async function getAllOrders(): Promise<any[]> {
+export async function getAllOrders(userId: string): Promise<any[]> {
   try {
     const collectionRef = collection(db, "orders");
-    const snapshot = await getDocs(collectionRef);
+    const q = query(collectionRef, where("userId", "==", userId));
+    const snapshot = await getDocs(q);
 
     const orders = snapshot.docs.map((doc) => {
       const data = doc.data();

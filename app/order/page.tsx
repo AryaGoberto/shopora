@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Bell, Package } from 'lucide-react';
 import Link from 'next/link';
 import { getAllOrders, updateOrderStatus, getOrderReviews } from '../lib/firestoreService';
+import { auth } from '../lib/firebase';
 import OrderCard from '../components/order/OrderCard';
 
 type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'received';
@@ -33,9 +34,19 @@ export default function MyOrdersPage() {
     const loadOrders = async () => {
       try {
         setIsLoading(true);
-        console.log('📥 Fetching all orders from Firestore...');
         
-        const allOrders = await getAllOrders();
+        // Get current user
+        const user = auth.currentUser;
+        if (!user) {
+          console.warn('⚠️ User not authenticated');
+          setOrders([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log('📥 Fetching orders for user:', user.uid);
+        
+        const allOrders = await getAllOrders(user.uid);
         console.log('📦 Raw orders from Firestore:', allOrders);
         
         if (!allOrders || allOrders.length === 0) {

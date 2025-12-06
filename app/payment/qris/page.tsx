@@ -13,7 +13,6 @@ export default function QrisPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const amount = parseInt(searchParams.get('amount') || '0');
-  const { clearCart } = useCart();
   const [copied, setCopied] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -27,7 +26,6 @@ export default function QrisPage() {
 
   const handleConfirm = () => {
     setConfirmed(true);
-    clearCart();
     setTimeout(() => {
       router.push('/payment-success');
     }, 2000);
