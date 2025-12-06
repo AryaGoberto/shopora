@@ -23,11 +23,10 @@ export default function CartItem({
   onDecrease,
   onRemove,
   onUpdateQuantity,
-  readOnly = false
+  readOnly = false,
 }: CartItemProps) {
-
   // Gunakan ID langsung tanpa konversi
-  const productId = item.id; 
+  const productId = item.id;
 
   const handleIncrease = () => {
     if (onUpdateQuantity) {
@@ -55,12 +54,13 @@ export default function CartItem({
   return (
     <div className="flex gap-4 py-4 border-b border-gray-200 last:border-0">
       {/* Product Image */}
-      <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden relative shrink-0">
+      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden relative shrink-0">
         <Image
           src={item.image || "https://placehold.co/100"}
           alt={item.name}
           fill
           className="object-cover"
+          sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 128px"
         />
       </div>
 
@@ -68,17 +68,25 @@ export default function CartItem({
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-bold text-lg md:text-xl line-clamp-1">{item.name}</h3>
-            
+            <h3 className="font-bold text-lg md:text-xl line-clamp-1">
+              {item.name}
+            </h3>
+
             {/* Tampilkan Size & Color jika ada */}
             <p className="text-sm text-gray-600 mt-1">
-              Size: <span className="text-gray-500">
-                {item.sizes && item.sizes.length > 0 ? item.sizes[0] : "Standard"}
+              Size:{" "}
+              <span className="text-gray-500">
+                {item.sizes && item.sizes.length > 0
+                  ? item.sizes[0]
+                  : "Standard"}
               </span>
             </p>
             <p className="text-sm text-gray-600">
-              Color: <span className="text-gray-500">
-                {item.colors && item.colors.length > 0 ? item.colors[0] : "Standard"}
+              Color:{" "}
+              <span className="text-gray-500">
+                {item.colors && item.colors.length > 0
+                  ? item.colors[0]
+                  : "Standard"}
               </span>
             </p>
           </div>
@@ -102,7 +110,9 @@ export default function CartItem({
 
           {/* Quantity Update Action */}
           {readOnly ? (
-             <span className="text-sm text-gray-600 font-medium">Qty: {item.quantity}</span>
+            <span className="text-sm text-gray-600 font-medium">
+              Qty: {item.quantity}
+            </span>
           ) : (
             <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 gap-4">
               <button
@@ -118,7 +128,9 @@ export default function CartItem({
                 <Minus size={16} />
               </button>
 
-              <span className="font-medium w-8 text-center">{item.quantity}</span>
+              <span className="font-medium w-8 text-center">
+                {item.quantity}
+              </span>
 
               <button
                 type="button"

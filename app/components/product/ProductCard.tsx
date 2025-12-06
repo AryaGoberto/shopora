@@ -43,13 +43,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link href={`/detail/${product.id}`}>
       <div className="bg-gray-50 rounded-2xl p-4 hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full group">
-        <div className="bg-white rounded-xl h-64 flex items-center justify-center mb-4 p-4 relative overflow-hidden">
+        <div className="bg-white rounded-xl w-full aspect-square flex items-center justify-center mb-4 p-4 relative overflow-hidden">
           <Image
             src={product.image}
             alt={product.name}
-            width={300}
-            height={300}
-            className="object-contain h-full w-full mix-blend-multiply group-hover:scale-110 transition-transform duration-300"
+            fill
+            className="object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300"
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 33vw"
           />
           {product.discount && (
             <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -69,9 +69,7 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
         {/* BAGIAN HARGA & CORETAN */}
         <div className="mt-auto flex items-center gap-2 flex-wrap">
-          <span className="font-bold text-xl">
-            {formatIDR(product.price)}
-          </span>
+          <span className="font-bold text-xl">{formatIDR(product.price)}</span>
 
           {/* Ini Logika Coretannya */}
           {product.originalPrice && (

@@ -21,6 +21,7 @@ import { getProductById } from "../../lib/firestoreService";
 import { Product } from "../../lib/types";
 import { useCart } from "../../context/CartContext";
 import Header from "@/app/components/common/Header";
+import Footer from "@/app/components/common/footer";
 
 // --- Helper Stars ---
 const renderStars = (rating: number, size: string = "w-5 h-5") => {
@@ -29,7 +30,9 @@ const renderStars = (rating: number, size: string = "w-5 h-5") => {
   const hasHalfStar = rating % 1 !== 0;
 
   for (let i = 0; i < fullStars; i++) {
-    stars.push(<Star key={i} className={`${size} fill-yellow-400 text-yellow-400`} />);
+    stars.push(
+      <Star key={i} className={`${size} fill-yellow-400 text-yellow-400`} />
+    );
   }
   if (hasHalfStar) {
     stars.push(
@@ -73,8 +76,8 @@ export default function ProductDetailPage() {
           // Handle colors that might be objects {name, hex} or strings
           let safeColors: string[] = [];
           if (Array.isArray(data.colors)) {
-            safeColors = data.colors.map((c: any) => {
-              if (typeof c === 'object' && c !== null && 'name' in c) {
+            safeColors = data.colors.map((c: unknown) => {
+              if (typeof c === "object" && c !== null && "name" in c) {
                 return c.name; // Extract name if object
               }
               return String(c); // Otherwise force to string
@@ -84,19 +87,18 @@ export default function ProductDetailPage() {
           const safeSizes = Array.isArray(data.sizes) ? data.sizes : [];
 
           // Create clean product object
-          const cleanProduct = { 
-            ...data, 
-            colors: safeColors, 
-            sizes: safeSizes 
+          const cleanProduct = {
+            ...data,
+            colors: safeColors,
+            sizes: safeSizes,
           } as Product;
-          
+
           setProduct(cleanProduct);
           setMainImage(cleanProduct.image);
-          
+
           // Set defaults
           if (safeColors.length > 0) setSelectedColor(safeColors[0]);
           if (safeSizes.length > 0) setSelectedSize(safeSizes[0]);
-
         } else {
           setError("Produk tidak ditemukan");
         }
@@ -123,11 +125,11 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     addToCart(
-      product, 
-      quantity, 
-      selectedColor || undefined, 
+      product,
+      quantity,
+      selectedColor || undefined,
       selectedSize || undefined
     );
 
@@ -150,8 +152,12 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{error || "Product not found"}</h2>
-          <Link href="/" className="text-blue-600 hover:underline font-medium">← Back to Home</Link>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {error || "Product not found"}
+          </h2>
+          <Link href="/" className="text-blue-600 hover:underline font-medium">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     );
@@ -159,34 +165,45 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
-        <Header/>
+      <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 pt-24"> 
+      <div className="max-w-7xl mx-auto px-4 pt-10">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">
-            <li><Link href="/" className="hover:text-gray-700">Home</Link></li>
+            <li>
+              <Link href="/" className="hover:text-gray-700">
+                Home
+              </Link>
+            </li>
             <span className="text-gray-400">/</span>
-            <li><span className="text-gray-800 font-medium">{product.category || "Product"}</span></li>
+            <li>
+              <span className="text-gray-800 font-medium">
+                {product.category || "Product"}
+              </span>
+            </li>
           </ol>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* LEFT: IMAGE */}
           <div className="flex flex-col gap-4">
-            <div className="bg-gray-100 rounded-xl overflow-hidden shadow-lg h-[500px] lg:h-[600px] flex items-center justify-center relative">
+            <div className="bg-gray-100 rounded-xl overflow-hidden shadow-lg w-full aspect-square flex items-center justify-center relative">
               <Image
                 src={mainImage || "https://placehold.co/500"}
                 alt={product.name}
                 fill
                 className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
 
           {/* RIGHT: INFO */}
           <div>
-            <h1 className="text-4xl font-black text-gray-900 mb-3 uppercase">{product.name}</h1>
+            <h1 className="text-4xl font-black text-gray-900 mb-3 uppercase">
+              {product.name}
+            </h1>
 
             <div className="flex items-center space-x-4 mb-4">
               <span className="text-3xl font-bold text-[#1230AE]">
@@ -206,7 +223,9 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6 border-b pb-6">
-              <div className="flex">{renderStars(product.rating || 0, "w-4 h-4")}</div>
+              <div className="flex">
+                {renderStars(product.rating || 0, "w-4 h-4")}
+              </div>
               <span>({product.reviewCount || 0} reviews)</span>
             </div>
 
@@ -263,24 +282,42 @@ export default function ProductDetailPage() {
             {/* Quantity & Add to Cart */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center border border-gray-300 rounded-full overflow-hidden bg-gray-50">
-                <button onClick={() => handleQuantityChange("decrease")} className="p-3 hover:bg-gray-200 transition-colors">
+                <button
+                  onClick={() => handleQuantityChange("decrease")}
+                  className="p-3 hover:bg-gray-200 transition-colors"
+                >
                   <Minus size={20} />
                 </button>
-                <span className="px-4 font-bold text-lg w-12 text-center">{quantity}</span>
-                <button onClick={() => handleQuantityChange("increase")} className="p-3 hover:bg-gray-200 transition-colors">
+                <span className="px-4 font-bold text-lg w-12 text-center">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => handleQuantityChange("increase")}
+                  className="p-3 hover:bg-gray-200 transition-colors"
+                >
                   <Plus size={20} />
                 </button>
               </div>
-              
+
               <button
                 onClick={handleAddToCart}
                 className={`flex-1 flex items-center justify-center space-x-3 py-3 px-6 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-xl transform active:scale-95
-                  ${isAdded ? "bg-green-600 text-white" : "bg-[#1230AE] text-white hover:bg-[#0f2890]"}`}
+                  ${
+                    isAdded
+                      ? "bg-green-600 text-white"
+                      : "bg-[#1230AE] text-white hover:bg-[#0f2890]"
+                  }`}
               >
                 {isAdded ? (
-                  <> <Check size={24} /> <span>Added!</span> </>
+                  <>
+                    {" "}
+                    <Check size={24} /> <span>Added!</span>{" "}
+                  </>
                 ) : (
-                  <> <ShoppingCart size={24} /> <span>Add to Cart</span> </>
+                  <>
+                    {" "}
+                    <ShoppingCart size={24} /> <span>Add to Cart</span>{" "}
+                  </>
                 )}
               </button>
 
@@ -291,8 +328,9 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
-      
+
       <Newsletter />
+      <Footer />
     </div>
   );
 }
