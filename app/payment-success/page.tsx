@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -13,8 +13,8 @@ import Footer from '../components/common/footer';
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const { cart, totalPrice, clearCart } = useCart();
-  const [hasOrderBeenSaved, setHasOrderBeenSaved] = useState(false);
   const [invoiceNumber] = useState(`INV-${Date.now()}`);
+  const saveAttemptedRef = useRef(false);
 
   const { subtotal, discount, deliveryFee, total } = calculateOrderTotal(totalPrice);
 
@@ -22,10 +22,12 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     const saveOrderToFirestore = async () => {
       // Only save if cart has items and order hasn't been saved yet
-      if (cart.length === 0 || hasOrderBeenSaved) {
-        console.log('⏭️ Skipping save - cart empty or already saved');
+      if (saveAttemptedRef.current || cart.length === 0) {
+        console.log('⏭️ Skipping save - already attempted or cart empty');
         return;
       }
+
+      saveAttemptedRef.current = true;
 
       try {
         console.log('📝 Saving order to Firestore...');
@@ -35,6 +37,8 @@ export default function PaymentSuccessPage() {
         const user = auth.currentUser;
         if (!user) {
           console.error('❌ User not authenticated. Waiting for auth...');
+          // Reset ref to retry
+          saveAttemptedRef.current = false;
           // Retry after 1 second
           setTimeout(() => saveOrderToFirestore(), 1000);
           return;
@@ -62,19 +66,18 @@ export default function PaymentSuccessPage() {
         const orderId = await saveOrder(orderData);
         console.log('✅ Order saved successfully with ID:', orderId);
         
-        // Mark as saved to prevent duplicate saves
-        setHasOrderBeenSaved(true);
-        
         // Clear cart after successful save
         clearCart();
         
       } catch (error) {
         console.error('❌ Error saving order:', error);
+        // Reset ref to retry on error
+        saveAttemptedRef.current = false;
       }
     };
 
     saveOrderToFirestore();
-  }, [cart, hasOrderBeenSaved, total, subtotal, discount, deliveryFee, invoiceNumber, clearCart]);
+  }, []);
 
   // Auto redirect after 5 seconds
   useEffect(() => {
