@@ -1,14 +1,67 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { calculateOrderTotal } from '../lib/config';
+import { saveOrder } from '../lib/firestoreService';
 import Header from '../components/common/Header';
 import Footer from '../components/common/footer';
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
+  const { cart, totalPrice, clearCart } = useCart();
+  const [hasOrderBeenSaved, setHasOrderBeenSaved] = useState(false);
+  const [invoiceNumber] = useState(`INV-${Date.now()}`);
 
+  const { subtotal, discount, deliveryFee, total } = calculateOrderTotal(totalPrice);
+
+  // Save order to Firestore - only once
+  useEffect(() => {
+    const saveOrderToFirestore = async () => {
+      // Only save if cart has items and order hasn't been saved yet
+      if (cart.length === 0 || hasOrderBeenSaved) {
+        return;
+      }
+
+      try {
+        console.log('📝 Saving order to Firestore...');
+        
+        // Prepare order data
+        const orderData = {
+          items: cart,
+          totalPrice: total,
+          subtotal: subtotal,
+          discount: discount,
+          deliveryFee: deliveryFee,
+          paymentMethod: 'fake-payment',
+          invoiceNumber: invoiceNumber,
+          status: 'confirmed',
+          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('id-ID'),
+        };
+
+        console.log('Order data:', orderData);
+
+        // Save to Firestore
+        const orderId = await saveOrder(orderData);
+        console.log('✅ Order saved successfully with ID:', orderId);
+        
+        // Mark as saved to prevent duplicate saves
+        setHasOrderBeenSaved(true);
+        
+        // Clear cart after successful save
+        clearCart();
+        
+      } catch (error) {
+        console.error('❌ Error saving order:', error);
+      }
+    };
+
+    saveOrderToFirestore();
+  }, [cart, hasOrderBeenSaved]); // Only depend on these two
+
+  // Auto redirect after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/');

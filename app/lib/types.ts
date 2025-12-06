@@ -40,7 +40,41 @@ export interface Admin {
   updatedAt: Date;
 }
 
-// 4. Legacy (Opsional, biar kode lama ga error)
+// 4. Tipe Data Order (Pesanan dari Payment)
+export interface Order {
+  id?: string;
+  items: CartItem[];
+  userId?: string;
+  userEmail?: string;
+  totalPrice: number;
+  subtotal: number;
+  discount: number;
+  deliveryFee: number;
+  paymentMethod: string;
+  invoiceNumber: string;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'received';
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  estimatedDelivery?: string;
+}
+
+// 5. Tipe Data Review (Review dari Customer)
+export interface Review {
+  id?: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  rating: number; // 1-5
+  title: string;
+  comment: string;
+  images?: string[];
+  userName?: string;
+  userEmail?: string;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+}
+
+// 6. Legacy (Opsional, biar kode lama ga error)
 export interface FakeProduct {
   id: number;
   title: string;

@@ -127,7 +127,16 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 export const useAdmin = () => {
   const context = useContext(AdminContext);
   if (context === undefined) {
-    throw new Error("useAdmin must be used within AdminProvider");
+    // Return default value instead of throwing error
+    // This allows components to work even if AdminProvider is not present
+    return {
+      adminUser: null,
+      adminData: null,
+      isLoading: false,
+      login: async () => { throw new Error("AdminProvider not available"); },
+      logout: async () => { throw new Error("AdminProvider not available"); },
+      isAdmin: false,
+    } as AdminContextType;
   }
   return context;
 };

@@ -13,7 +13,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Product } from "./types";
+import { Product, Review } from "./types";
 
 // ============ PRODUCT OPERATIONS ============
 
@@ -285,5 +285,286 @@ export async function deleteProduct(productId: string): Promise<void> {
   } catch (error) {
     console.error("❌ Error deleting product:", error);
     throw error;
+  }
+}
+
+// ============ ORDER OPERATIONS ============
+
+/**
+ * Save order to Firestore after payment
+ */
+export async function saveOrder(order: any): Promise<string> {
+  try {
+    console.log('📝 Preparing to save order to Firestore...');
+    console.log('Order data:', order);
+    
+    const collectionRef = collection(db, "orders");
+    
+    // Prepare order data with timestamps
+    const orderDataToSave = {
+      ...order,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    console.log('Final order data to save:', orderDataToSave);
+    
+    const docRef = await addDoc(collectionRef, orderDataToSave);
+
+    console.log("✅ Order saved successfully with ID:", docRef.id);
+    console.log("📍 Collection: orders, Document:", docRef.id);
+    
+    return docRef.id;
+  } catch (error) {
+    console.error("❌ Error saving order:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get all orders (bisa di-filter by userId nanti)
+ */
+export async function getAllOrders(): Promise<any[]> {
+  try {
+    const collectionRef = collection(db, "orders");
+    const snapshot = await getDocs(collectionRef);
+
+    const orders = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      
+      // Handle createdAt - bisa Firestore Timestamp atau Date object
+      let createdAtDate = new Date();
+      if (data.createdAt) {
+        if (typeof data.createdAt.toDate === 'function') {
+          // Firestore Timestamp
+          createdAtDate = data.createdAt.toDate();
+        } else if (data.createdAt instanceof Date) {
+          // Already a Date object
+          createdAtDate = data.createdAt;
+        } else if (typeof data.createdAt === 'string') {
+          // Date string
+          createdAtDate = new Date(data.createdAt);
+        }
+      }
+
+      // Handle updatedAt
+      let updatedAtDate = new Date();
+      if (data.updatedAt) {
+        if (typeof data.updatedAt.toDate === 'function') {
+          // Firestore Timestamp
+          updatedAtDate = data.updatedAt.toDate();
+        } else if (data.updatedAt instanceof Date) {
+          // Already a Date object
+          updatedAtDate = data.updatedAt;
+        } else if (typeof data.updatedAt === 'string') {
+          // Date string
+          updatedAtDate = new Date(data.updatedAt);
+        }
+      }
+
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: createdAtDate,
+        updatedAt: updatedAtDate,
+      };
+    });
+
+    console.log(`✅ Fetched ${orders.length} orders from Firestore`);
+    return orders;
+  } catch (error) {
+    console.error("❌ Error fetching orders:", error);
+    return [];
+  }
+}
+
+/**
+ * Update order status
+ */
+export async function updateOrderStatus(
+  orderId: string,
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'received'
+): Promise<void> {
+  try {
+    const docRef = doc(db, "orders", orderId);
+    await updateDoc(docRef, {
+      status,
+      updatedAt: new Date(),
+    });
+
+    console.log("✅ Order status updated:", orderId, "->", status);
+  } catch (error) {
+    console.error("❌ Error updating order status:", error);
+    throw error;
+  }
+}
+
+// ============ REVIEW OPERATIONS ============
+
+/**
+ * Simpan review dari customer ke Firestore
+ */
+export async function saveReview(review: {
+  orderId: string;
+  productId: string;
+  productName: string;
+  rating: number;
+  title: string;
+  comment: string;
+  userName?: string;
+  userEmail?: string;
+  images?: string[];
+}): Promise<string> {
+  try {
+    const collectionRef = collection(db, "reviews");
+    const docRef = await addDoc(collectionRef, {
+      ...review,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    console.log("✅ Review saved:", docRef.id);
+
+    // Update product rating
+    await updateProductRating(review.productId);
+
+    return docRef.id;
+  } catch (error) {
+    console.error("❌ Error saving review:", error);
+    throw error;
+  }
+}
+
+/**
+ * Ambil semua reviews untuk product tertentu
+ */
+export async function getProductReviews(productId: string) {
+  try {
+    const q = query(collection(db, "reviews"), where("productId", "==", productId));
+    const snapshot = await getDocs(q);
+
+    const reviews = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      
+      // Handle createdAt date
+      let createdAtDate = new Date();
+      if (data.createdAt) {
+        if (typeof data.createdAt.toDate === 'function') {
+          createdAtDate = data.createdAt.toDate();
+        } else if (data.createdAt instanceof Date) {
+          createdAtDate = data.createdAt;
+        } else if (typeof data.createdAt === 'string') {
+          createdAtDate = new Date(data.createdAt);
+        }
+      }
+
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: createdAtDate,
+      };
+    });
+
+    console.log(`✅ Fetched ${reviews.length} reviews for product ${productId}`);
+    return reviews;
+  } catch (error) {
+    console.error("❌ Error fetching reviews:", error);
+    return [];
+  }
+}
+
+/**
+ * Update product rating berdasarkan semua reviews
+ */
+export async function updateProductRating(productId: string): Promise<void> {
+  try {
+    // Ambil semua reviews untuk product
+    const q = query(collection(db, "reviews"), where("productId", "==", productId));
+    const snapshot = await getDocs(q);
+
+    const reviews = snapshot.docs.map((doc) => doc.data());
+
+    if (reviews.length === 0) {
+      console.log("⚠️ No reviews found for product:", productId);
+      return;
+    }
+
+    // Hitung rata-rata rating
+    const totalRating = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+    const avgRating = totalRating / reviews.length;
+
+    // Update product dengan rating baru
+    const productRef = doc(db, "products", productId);
+    await updateDoc(productRef, {
+      rating: parseFloat(avgRating.toFixed(1)),
+      reviewCount: reviews.length,
+      updatedAt: new Date(),
+    });
+
+    console.log(
+      `✅ Product ${productId} rating updated: ${avgRating.toFixed(1)} (${reviews.length} reviews)`
+    );
+  } catch (error) {
+    console.error("❌ Error updating product rating:", error);
+    throw error;
+  }
+}
+
+/**
+ * Check apakah user sudah review product ini (dari order tertentu)
+ */
+export async function hasUserReviewedProduct(
+  orderId: string,
+  productId: string
+): Promise<boolean> {
+  try {
+    const q = query(
+      collection(db, "reviews"),
+      where("orderId", "==", orderId),
+      where("productId", "==", productId)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.length > 0;
+  } catch (error) {
+    console.error("❌ Error checking review:", error);
+    return false;
+  }
+}
+
+/**
+ * Ambil semua reviews untuk order tertentu
+ */
+export async function getOrderReviews(orderId: string) {
+  try {
+    const q = query(collection(db, "reviews"), where("orderId", "==", orderId));
+    const snapshot = await getDocs(q);
+
+    const reviews = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      
+      // Handle createdAt date
+      let createdAtDate = new Date();
+      if (data.createdAt) {
+        if (typeof data.createdAt.toDate === 'function') {
+          createdAtDate = data.createdAt.toDate();
+        } else if (data.createdAt instanceof Date) {
+          createdAtDate = data.createdAt;
+        } else if (typeof data.createdAt === 'string') {
+          createdAtDate = new Date(data.createdAt);
+        }
+      }
+
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: createdAtDate,
+      };
+    });
+
+    console.log(`✅ Fetched ${reviews.length} reviews for order ${orderId}`);
+    return reviews;
+  } catch (error) {
+    console.error("❌ Error fetching reviews for order:", error);
+    return [];
   }
 }
