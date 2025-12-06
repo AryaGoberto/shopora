@@ -6,6 +6,7 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { calculateOrderTotal } from '../lib/config';
 import { saveOrder } from '../lib/firestoreService';
+import { auth } from '../lib/firebase';
 import Header from '../components/common/Header';
 import Footer from '../components/common/footer';
 
@@ -22,14 +23,28 @@ export default function PaymentSuccessPage() {
     const saveOrderToFirestore = async () => {
       // Only save if cart has items and order hasn't been saved yet
       if (cart.length === 0 || hasOrderBeenSaved) {
+        console.log('⏭️ Skipping save - cart empty or already saved');
         return;
       }
 
       try {
         console.log('📝 Saving order to Firestore...');
+        console.log('Cart items:', cart.length);
+        
+        // Get current user - might need to wait a bit for auth to initialize
+        const user = auth.currentUser;
+        if (!user) {
+          console.error('❌ User not authenticated. Waiting for auth...');
+          // Retry after 1 second
+          setTimeout(() => saveOrderToFirestore(), 1000);
+          return;
+        }
+        
+        console.log('✅ User authenticated:', user.uid);
         
         // Prepare order data
         const orderData = {
+          userId: user.uid,
           items: cart,
           totalPrice: total,
           subtotal: subtotal,
@@ -59,7 +74,7 @@ export default function PaymentSuccessPage() {
     };
 
     saveOrderToFirestore();
-  }, [cart, hasOrderBeenSaved]); // Only depend on these two
+  }, [cart, hasOrderBeenSaved, total, subtotal, discount, deliveryFee, invoiceNumber, clearCart]);
 
   // Auto redirect after 5 seconds
   useEffect(() => {
