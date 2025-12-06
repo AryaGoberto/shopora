@@ -13,8 +13,8 @@ export interface CartItem extends Product {
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product, quantity?: number, color?: string, size?: string) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, qty: number) => void;
+  removeFromCart: (id: string | number) => void;
+  updateQuantity: (id: string | number, qty: number) => void;
   clearCart: () => void;
   totalPrice: number;
   totalItems: number;
@@ -43,30 +43,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // Fungsi Tambah
   const addToCart = (product: Product, qty = 1, color?: string, size?: string) => {
     setCart((prev) => {
-      const existingItem = prev.find((item) => item.id === product.id);
+      const existingItem = prev.find((item) => item.id == product.id);
       if (existingItem) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + qty } : item
+          item.id == product.id ? { ...item, quantity: item.quantity + qty } : item
         );
       }
       const newColors = color ? [color] : (product.colors || []);
       const newSizes = size ? [size] : (product.sizes || []);
-      
+
       return [...prev, { ...product, quantity: qty, colors: newColors, sizes: newSizes }];
     });
   };
 
   // 2. FUNGSI HAPUS (REMOVE)
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (id: string | number) => {
+    setCart((prev) => prev.filter((item) => item.id != id));
   };
 
   // 3. FUNGSI UPDATE JUMLAH (QTY)
-  const updateQuantity = (id: number, qty: number) => {
-    setCart((prev) => 
-      prev.map((item) => 
-        // Pastikan qty minimal 1
-        item.id === id ? { ...item, quantity: Math.max(1, qty) } : item
+  const updateQuantity = (id: string | number, qty: number) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        // Bandingkan dengan loose equality untuk mengatasi type mismatch string/number
+        item.id == id ? { ...item, quantity: Math.max(1, qty) } : item
       )
     );
   };

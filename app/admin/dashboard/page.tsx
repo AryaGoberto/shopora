@@ -132,14 +132,14 @@ export default function AdminDashboardPage() {
         {/* Alerts */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle size={20} className="text-red-600 shrink-0 mt-0.5" />
             <p className="text-red-800">{error}</p>
           </div>
         )}
 
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
+            <CheckCircle size={20} className="text-green-600 shrink-0 mt-0.5" />
             <p className="text-green-800">{success}</p>
           </div>
         )}
@@ -244,12 +244,12 @@ export default function AdminDashboardPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(product.id)}
-                      disabled={deletingId === product.id}
+                      onClick={() => handleDelete(String(product.id))}
+                      disabled={deletingId === String(product.id)}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium text-sm disabled:opacity-50"
                     >
                       <Trash2 size={16} />
-                      {deletingId === product.id ? "Deleting..." : "Hapus"}
+                      {deletingId === String(product.id) ? "Deleting..." : "Hapus"}
                     </button>
                   </div>
                 </div>

@@ -73,7 +73,10 @@ export default function EditProductPage() {
 
       // Format colors untuk input
       const colorString = product.colors
-        ?.map((c) => `${c.name}:${c.hex}`)
+        ?.map((c) => {
+          if (typeof c === 'string') return c;
+          return `${(c as any).name}:${(c as any).hex}`;
+        })
         .join("; ") || "";
 
       setFormData({
@@ -81,8 +84,8 @@ export default function EditProductPage() {
         price: product.price.toString(),
         originalPrice: product.originalPrice?.toString() || "",
         discount: product.discount || "",
-        description: product.description,
-        category: product.category,
+        description: product.description || "",
+        category: product.category || "",
         brand: product.brand || "",
         image: product.image,
         rating: (product.rating || 0).toString(),
@@ -138,11 +141,8 @@ export default function EditProductPage() {
         .filter((s) => s);
       const colors = formData.colors
         .split(";")
-        .map((c) => {
-          const [name, hex] = c.split(":");
-          return name && hex ? { name: name.trim(), hex: hex.trim() } : null;
-        })
-        .filter(Boolean) as Array<{ name: string; hex: string }>;
+        .map((c) => c.trim())
+        .filter((c) => c.length > 0);
 
       // Update product
       const updates = {
@@ -152,8 +152,8 @@ export default function EditProductPage() {
           ? parseFloat(formData.originalPrice)
           : undefined,
         discount: formData.discount || undefined,
-        description: formData.description,
-        category: formData.category,
+        description: formData.description || undefined,
+        category: formData.category || undefined,
         brand: formData.brand ? formData.brand.trim() : undefined,
         image: formData.image,
         rating: parseFloat(formData.rating) || 0,
@@ -215,14 +215,14 @@ export default function EditProductPage() {
         {/* Alerts */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle size={20} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle size={20} className="text-red-600 shrink-0 mt-0.5" />
             <p className="text-red-800">{error}</p>
           </div>
         )}
 
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <CheckCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
+            <CheckCircle size={20} className="text-green-600 shrink-0 mt-0.5" />
             <p className="text-green-800">{success}</p>
           </div>
         )}

@@ -2,7 +2,7 @@
 
 // 1. Tipe Data Produk Utama
 export interface Product {
-  id: number; // ID Angka (sesuai CSV)
+  id: string | number; // ID bisa string (Firestore doc.id) atau number
   name: string;
   price: number;
   image: string;
