@@ -1,4 +1,3 @@
-// app/components/TopBrandBanner.tsx
 import React from "react";
 
 interface TopBrandBannerProps {
@@ -12,7 +11,6 @@ const TopBrandBanner: React.FC<TopBrandBannerProps> = ({
   heightClass = "h-48",
   bgColorClass = "bg-gray-100",
 }) => (
-  // Gunakan prop di sini untuk membuat banner lebih reusable
   <div
     className={`mb-8 p-6 ${bgColorClass} rounded-lg ${heightClass} flex items-center justify-center`}
   >
