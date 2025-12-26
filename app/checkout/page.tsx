@@ -23,10 +23,7 @@ export default function CheckoutPage() {
   const { cart, totalPrice, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
 
-  // Hitung total menggunakan konfigurasi
   const { subtotal, discount, deliveryFee, total, isFreeShipping } = calculateOrderTotal(totalPrice);
-
-  // Redirect jika cart kosong
   useEffect(() => {
     if (cart.length === 0) {
       router.push("/cart");
@@ -34,7 +31,7 @@ export default function CheckoutPage() {
   }, [cart, router]);
 
   if (cart.length === 0) {
-    return null; // Atau loading spinner
+    return null; 
   }
 
   return (
@@ -44,18 +41,13 @@ export default function CheckoutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
 
-            {/* KIRI: Ringkasan Pesanan */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border">
               <h2 className="text-2xl font-bold text-[#1230AE] mb-6">Ringkasan Pesanan</h2>
-
-              {/* Item List */}
               <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
                 {cart.map((item) => (
                   <CartItem key={item.id} item={item} readOnly={true} />
                 ))}
               </div>
-
-              {/* Order Summary */}
               <div className="border-t pt-4 space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({cart.length} items)</span>
@@ -86,15 +78,12 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
-
-            {/* KANAN: Konfirmasi Pembayaran */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border h-fit">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-xl font-bold">Konfirmasi Pembayaran</h1>
                 <button onClick={() => router.back()} className="text-gray-400 hover:text-gray-600">✕</button>
               </div>
 
-              {/* Ringkasan Tagihan */}
               <div className="border border-gray-200 rounded-xl p-6 text-center mb-6 bg-blue-50/50">
                 <p className="text-gray-500 text-sm mb-1">Total Tagihan</p>
                 <h2 className="text-3xl font-bold text-blue-700">{formatIDR(total)}</h2>
