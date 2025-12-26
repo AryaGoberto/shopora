@@ -1,6 +1,6 @@
 # 🍽️ Shopora
 
-A modern e-commerce application for browsing and purchasing products online (in collaboration with Bryan, Azizah, Aradyzah, Deiv)
+A modern e-commerce application for browsing and purchasing products online 
 ---
 
 ## 📱 Features / Screen
