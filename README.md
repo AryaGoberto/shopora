@@ -1,6 +1,6 @@
 # 🍽️ Shopora
 
-A modern e-commerce application for browsing and purchasing products online 
+A modern e-commerce application for browsing and purchasing products online, integrated with gemini API for AI chatbot
 ---
 
 ## 📱 Features / Screen
